@@ -47,6 +47,10 @@ jobs:
           test -f Payload/Fantaclaude.app/PlugIns/FantaclaudeWidget.appex/FantaclaudeWidget
           /usr/libexec/PlistBuddy -c "Print :NSExtension:NSExtensionPointIdentifier" Payload/Fantaclaude.app/PlugIns/FantaclaudeWidget.appex/Info.plist
           /usr/libexec/PlistBuddy -c "Print :FantaHost" Payload/Fantaclaude.app/Info.plist | sed 's/./*/g'   # solo per controllare che non sia vuoto
+          # le icone alternative (Lega > Icona dell'app) devono essere dichiarate nell'Info.plist
+          /usr/libexec/PlistBuddy -c "Print :CFBundleIcons:CFBundleAlternateIcons" Payload/Fantaclaude.app/Info.plist | head -n 20
+          # i target di test non devono finire nell'IPA
+          ! ls Payload/Fantaclaude.app/PlugIns | grep -i test
       - uses: actions/upload-artifact@v4
         with:
           name: Fantaclaude-ipa
