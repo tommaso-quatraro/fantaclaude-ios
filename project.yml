@@ -27,6 +27,8 @@ targets:
         PRODUCT_NAME: Fantaclaude
         TARGETED_DEVICE_FAMILY: "1,2"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        # icone alternative scelte in Lega > Icona dell'app (AppIcon-<colore> nell'asset catalog; il verde e' AppIcon)
+        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: "AppIcon-blu AppIcon-viola AppIcon-arancio AppIcon-rosso AppIcon-grafite"
     info:
       path: Config/Info.plist
       properties:
@@ -84,3 +86,52 @@ targets:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
         FantaHost: $(FANTA_HOST)
         FantaPort: $(FANTA_PORT)
+  FantaclaudeTests:
+    # test automatici (XCTest) di Domain, Data e ViewModel: girano nel simulatore (workflow test.yml). Non entrano nell'IPA.
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests/FantaclaudeTests
+      - path: Tests/Fixtures
+        buildPhase: resources
+    dependencies:
+      - target: Fantaclaude
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: it.tommaso.fantaclaude.tests
+        GENERATE_INFOPLIST_FILE: YES
+        TARGETED_DEVICE_FAMILY: "1,2"
+  FantaclaudeUITests:
+    # test di fumo dell'interfaccia (XCUITest) con l'app in modalità -DEMO
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: Tests/FantaclaudeUITests
+    dependencies:
+      - target: Fantaclaude
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: it.tommaso.fantaclaude.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TARGETED_DEVICE_FAMILY: "1,2"
+schemes:
+  Fantaclaude:
+    # i test si costruiscono ed eseguono solo con "test": archive e build normali (ipa.yml, screenshot.yml) non li toccano
+    build:
+      targets:
+        Fantaclaude: all
+        FantaclaudeTests: [test]
+        FantaclaudeUITests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - FantaclaudeTests
+        - FantaclaudeUITests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
