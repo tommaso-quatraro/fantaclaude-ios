@@ -16,10 +16,11 @@ struct FantaclaudeApp: App {
                 .environmentObject(statoFormazione)
                 .onContinueUserActivity(CSSearchableItemActionType) { attivita in
                     // Aperta da Spotlight su un giocatore osservato: si va alla sua scheda.
-                    if let id = Spotlight.idGiocatore(da: attivita) {
-                        nav.sezione = .mercato
-                        nav.giocatoreDaAprire = id
-                    }
+                    if let id = Spotlight.idGiocatore(da: attivita) { nav.vai(a: .giocatore(id)) }
+                }
+                .onOpenURL { url in
+                    // fantaclaude://formazione, fantaclaude://giocatore/12, ... (per esempio dal tocco su una notifica di ntfy)
+                    if let destinazione = Collegamenti.interpreta(url) { nav.vai(a: destinazione) }
                 }
                 .onChange(of: fase) { nuova in
                     // Uscendo dall'app si chiede a iOS il prossimo aggiornamento in background.
