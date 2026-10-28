@@ -36,6 +36,10 @@ jobs:
           cp -R build/Fantaclaude.xcarchive/Products/Applications/Fantaclaude.app Payload/
           zip -qry Fantaclaude.ipa Payload
           ls -la Fantaclaude.ipa
+          # l'estensione del widget deve stare dentro l'app (PlugIns), con il suo eseguibile
+          ls -la Payload/Fantaclaude.app/PlugIns/FantaclaudeWidget.appex
+          test -f Payload/Fantaclaude.app/PlugIns/FantaclaudeWidget.appex/FantaclaudeWidget
+          /usr/libexec/PlistBuddy -c "Print :NSExtension:NSExtensionPointIdentifier" Payload/Fantaclaude.app/PlugIns/FantaclaudeWidget.appex/Info.plist
           /usr/libexec/PlistBuddy -c "Print :FantaHost" Payload/Fantaclaude.app/Info.plist | sed 's/./*/g'   # solo per controllare che non sia vuoto
       - uses: actions/upload-artifact@v4
         with:
@@ -43,7 +47,7 @@ jobs:
           path: Fantaclaude.ipa
           retention-days: 30
       - name: Pubblica come release (da scaricare dall'iPhone)
-        if: github.event_name != 'pull_request'
+        if: github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
