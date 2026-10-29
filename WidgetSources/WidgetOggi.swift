@@ -97,7 +97,7 @@ struct VistaWidget: View {
             Image(systemName: "wifi.exclamationmark")
             Text("Nessun dato").font(.caption.bold())
             if !accessorio {
-                Text("Apri Fantaclaude con Tailscale acceso").font(.caption2).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                Text("Apri Undici con Tailscale acceso").font(.caption2).foregroundStyle(.secondary).multilineTextAlignment(.center)
             }
         }
     }

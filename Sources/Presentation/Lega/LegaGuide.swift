@@ -10,7 +10,7 @@ struct NuovaVersioneSezione: View {
                 Section("Aggiornamento dell'app") {
                     Label("È disponibile la \(esito.nome) (hai la build \(NuovaVersione.buildInstallata))", systemImage: "arrow.down.circle")
                         .foregroundStyle(Color.verde)
-                    Text("Apri SideStore, tocca Sorgenti, poi Fantaclaude e «Aggiorna». Se non vedi il sorgente: in Sorgenti aggiungi https://github.com/tommaso-quatraro/fantaclaude-ios/releases/latest/download/sorgente.json")
+                    Text("Apri SideStore, tocca Sorgenti, poi Undici e «Aggiorna». Se non vedi il sorgente: in Sorgenti aggiungi https://github.com/tommaso-quatraro/fantaclaude-ios/releases/latest/download/sorgente.json")
                         .font(.footnote).foregroundStyle(.secondary)
                 }
             }
@@ -51,7 +51,7 @@ struct CertificatoSezione: View {
                 }
                 .accessibilityElement(children: .combine)
             }
-            Text("Con l'Apple ID gratuito il certificato dura 7 giorni. 24 ore e 6 ore prima della scadenza arriva un promemoria: «Rinnova l'app con SideStore».")
+            Text("Con l'Apple ID gratuito il certificato dura 7 giorni. 24 ore e 6 ore prima della scadenza arriva un promemoria: «Rinnovala con SideStore».")
                 .font(.footnote).foregroundStyle(.secondary)
         }
         .task {

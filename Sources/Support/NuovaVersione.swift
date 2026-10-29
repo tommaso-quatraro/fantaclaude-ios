@@ -49,8 +49,8 @@ enum NuovaVersione {
         if UserDefaults.standard.integer(forKey: chiaveAvvisata) < esito.build {
             await Notifiche.avviso(
                 id: "nuova-versione",
-                titolo: "Fantaclaude: c'è una versione nuova",
-                corpo: "Apri SideStore, tocca Sorgenti e poi «Aggiorna» su Fantaclaude (\(esito.nome)).")
+                titolo: "Undici · C'è una versione nuova",
+                corpo: "Apri SideStore, tocca Sorgenti e poi «Aggiorna» su Undici (\(esito.nome)).")
             UserDefaults.standard.set(esito.build, forKey: chiaveAvvisata)
         }
         return esito
