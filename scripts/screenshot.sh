@@ -160,6 +160,21 @@ xcrun simctl openurl "$UDID_IPHONE" "fantaclaude://giocatore/203"
 sleep 3
 xcrun simctl io "$UDID_IPHONE" screenshot "$USCITA/prova-url_openurl-giocatore.png" >/dev/null 2>&1
 
+# La schermata di avvio (tentativo: si fotografa subito dopo il lancio, può essere già passata) e la Home di iOS
+# (serve a vedere nome e icona dell'app).
+xcrun simctl ui "$UDID_IPHONE" appearance dark
+xcrun simctl terminate "$UDID_IPHONE" "$ID_APP" >/dev/null 2>&1
+sleep 2
+xcrun simctl launch "$UDID_IPHONE" "$ID_APP" -DEMO >/dev/null 2>&1
+xcrun simctl io "$UDID_IPHONE" screenshot "$USCITA/avvio_iphone.png" >/dev/null 2>&1
+sleep 4
+for aspetto in dark light; do
+  xcrun simctl ui "$UDID_IPHONE" appearance "$aspetto"
+  xcrun simctl terminate "$UDID_IPHONE" "$ID_APP" >/dev/null 2>&1
+  sleep 3
+  xcrun simctl io "$UDID_IPHONE" screenshot "$USCITA/home_iphone_$aspetto.png" >/dev/null 2>&1
+done
+
 spegni_simulatore "$UDID_IPHONE"
 
 # ---------------------------------------------------------------- iPad
@@ -196,6 +211,11 @@ else
   giro "$UDID_IPAD" ipad_chiaro_orizzontale chiaro large oggi formazione mercato-classifica lega
 fi
 RADDRIZZA=0
+
+xcrun simctl ui "$UDID_IPAD" appearance dark
+xcrun simctl terminate "$UDID_IPAD" "$ID_APP" >/dev/null 2>&1
+sleep 3
+xcrun simctl io "$UDID_IPAD" screenshot "$USCITA/home_ipad_dark.png" >/dev/null 2>&1
 
 spegni_simulatore "$UDID_IPAD"
 

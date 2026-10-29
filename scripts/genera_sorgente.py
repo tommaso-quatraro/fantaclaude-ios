@@ -12,27 +12,27 @@ repo, build, ipa = sys.argv[1], sys.argv[2], sys.argv[3]
 base = f"https://github.com/{repo}"
 
 sorgente = {
-    "name": "Fantaclaude",
+    "name": "Undici",
     "identifier": "it.tommaso.fantaclaude.sorgente",
-    "subtitle": "Fantaclaude per iPhone e iPad",
-    "description": "Le versioni di Fantaclaude compilate da GitHub.",
+    "subtitle": "Undici per iPhone e iPad",
+    "description": "Le versioni di Undici compilate da GitHub.",
     "iconURL": f"https://raw.githubusercontent.com/{repo}/main/Sources/Assets.xcassets/AppIcon.appiconset/icon-1024.png",
-    "tintColor": "30D17F",
+    "tintColor": "3DDC97",
     "apps": [
         {
-            "name": "Fantaclaude",
+            "name": "Undici",
             "bundleIdentifier": "it.tommaso.fantaclaude",
             "developerName": "Tommaso",
             "subtitle": "Formazioni e scambi per il fantacalcio",
             "localizedDescription": "App nativa per scegliere la formazione e analizzare gli scambi, con widget, Siri e Comandi.",
             "iconURL": f"https://raw.githubusercontent.com/{repo}/main/Sources/Assets.xcassets/AppIcon.appiconset/icon-1024.png",
-            "tintColor": "30D17F",
+            "tintColor": "3DDC97",
             "version": f"1.0.{build}",
             "versionDate": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "versionDescription": f"Build {build}",
             "downloadURL": f"{base}/releases/download/build-{build}/Fantaclaude.ipa",
             "size": os.path.getsize(ipa),
-            "minOSVersion": "16.0",
+            "minOSVersion": "18.0",
         }
     ],
     "news": [],

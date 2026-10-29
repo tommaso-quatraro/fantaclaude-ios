@@ -38,9 +38,7 @@ struct AccessorioGiornata: View {
     var body: some View {
         Button(action: apri) {
             HStack(spacing: 8) {
-                Image(systemName: "timer")
-                    .symbolRenderingMode(.hierarchical)
-                    .foregroundStyle(Color.verde)
+                Marchio(lato: 22)
                     .accessibilityHidden(true)
                 contenuto
                 Spacer(minLength: 0)
@@ -73,7 +71,7 @@ struct AccessorioGiornata: View {
                 .accessibilityElement(children: .combine)
             }
         } else {
-            Text("Fantaclaude").font(.subheadline.weight(.semibold))
+            Text("Undici").font(.subheadline.weight(.semibold))
         }
     }
 }

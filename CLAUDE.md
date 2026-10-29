@@ -1,6 +1,6 @@
-# Fantaclaude per iPhone: regole del progetto
+# Undici per iPhone (repository `fantaclaude-ios`): regole del progetto
 
-App **nativa** (SwiftUI) per iPhone e iPad. Parla con il server di Fantaclaude sul Raspberry (API JSON, Tailscale acceso).
+App **nativa** (SwiftUI) per iPhone e iPad. Parla con il server di Undici sul Raspberry (API JSON, Tailscale acceso).
 Il server e la logica (modello, formazioni, scambi) stanno nell'altro repository: `C:\Users\Tommaso\Progetti\fantaclaude`. Qui c'è solo l'app.
 **Il `README.md` è la descrizione completa** (funzioni, architettura, come si compila, cosa provare sul telefono): leggilo prima di lavorarci.
 
