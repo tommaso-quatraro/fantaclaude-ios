@@ -63,13 +63,16 @@ struct Capsula: View {
     var simbolo: String? = nil
 
     var body: some View {
-        HStack(spacing: 4) {
-            if let simbolo { Image(systemName: simbolo).imageScale(.small).accessibilityHidden(true) }
-            Text(testo)
+        HStack(spacing: 5) {
+            if let simbolo {
+                Image(systemName: simbolo).imageScale(.small).foregroundStyle(colore).accessibilityHidden(true)
+            } else {
+                Circle().fill(colore).frame(width: 7, height: 7).accessibilityHidden(true)
+            }
+            Text(testo).foregroundStyle(.primary)
         }
         .font(.caption.weight(.semibold))
-        .foregroundStyle(colore)
         .padding(.horizontal, 9).padding(.vertical, 4)
-        .background(colore.opacity(0.15), in: Capsule())
+        .background(colore.opacity(0.18), in: Capsule())
     }
 }
