@@ -8,6 +8,10 @@ struct FantaclaudeApp: App {
     @StateObject private var modello = AppModel()
     @Environment(\.scenePhase) private var fase
 
+    init() {
+        Suggerimenti.configura()
+    }
+
     var body: some Scene {
         WindowGroup {
             // Colori chiari o scuri come il sistema: lo sfondo e il verde si adattano da soli.
@@ -22,7 +26,7 @@ struct FantaclaudeApp: App {
                     // fantaclaude://formazione, fantaclaude://giocatore/12, ... (per esempio dal tocco su una notifica di ntfy)
                     if let destinazione = Collegamenti.interpreta(url) { nav.vai(a: destinazione) }
                 }
-                .onChange(of: fase) { nuova in
+                .onChange(of: fase) { _, nuova in
                     // Uscendo dall'app si chiede a iOS il prossimo aggiornamento in background.
                     if nuova == .background { Aggiornamento.programma() }
                 }
