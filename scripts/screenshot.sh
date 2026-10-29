@@ -79,6 +79,13 @@ scatta() {
     ERRORI=$((ERRORI + 1))
     return
   fi
+  # Se la foto è quasi vuota (nera) l'app non aveva ancora finito di disegnarsi: si riprova dopo qualche secondo.
+  local peso
+  peso=$(stat -f%z "$file" 2>/dev/null || echo 999999)
+  if [ "$peso" -lt 150000 ]; then
+    sleep 5
+    xcrun simctl io "$udid" screenshot "$file" >/dev/null 2>&1
+  fi
   # Il simulatore fotografa sempre lo schermo "in verticale": con l'app in orizzontale la foto esce girata di 90 gradi.
   if [ "$RADDRIZZA" = "1" ]; then
     sips -r 270 "$file" >/dev/null 2>&1
