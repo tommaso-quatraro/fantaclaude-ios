@@ -219,6 +219,7 @@ struct AspettoView: View {
                         Text("Scuro").tag("scuro")
                     }
                     .pickerStyle(.segmented)
+                    .sensoryFeedback(.selection, trigger: tema)
                     Text("Automatico segue il chiaro e lo scuro di iPhone. La dimensione del testo si cambia in Impostazioni > Schermo e luminosità > Dimensione del testo: l'app la segue.")
                         .font(.footnote).foregroundStyle(.secondary)
                 }
@@ -261,9 +262,17 @@ struct AspettoView: View {
                     .fill(Color(uiColor: a.scuro))
                     .frame(width: 44, height: 44)
                     .overlay(Circle().strokeBorder(Color.primary.opacity(0.25), lineWidth: 1))
-                    .overlay { if accento == a.rawValue { Image(systemName: "checkmark").font(.headline.bold()).foregroundStyle(.black.opacity(0.75)) } }
+                    .overlay {
+                        if accento == a.rawValue {
+                            Image(systemName: "checkmark").font(.headline.bold()).foregroundStyle(.black.opacity(0.75))
+                                .transition(.scale.combined(with: .opacity))
+                        }
+                    }
+                    .scaleEffect(accento == a.rawValue ? 1.1 : 1)
+                    .animation(Tema.molla, value: accento)
             }
             .buttonStyle(.plain)
+            .sensoryFeedback(.selection, trigger: accento)
             .accessibilityLabel(a.nome)
             .accessibilityAddTraits(accento == a.rawValue ? .isSelected : [])
         }
@@ -310,7 +319,8 @@ struct IconaAppView: View {
                                     }
                                     .frame(minHeight: 44)
                                 }
-                                .buttonStyle(.plain)
+                                .buttonStyle(StilePressione())
+                                .animation(Tema.molla, value: corrente)
                                 .accessibilityLabel("Icona \(IconeApp.titolo(n))")
                                 .accessibilityAddTraits(corrente == n ? .isSelected : [])
                             }

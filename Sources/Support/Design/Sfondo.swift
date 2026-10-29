@@ -9,9 +9,9 @@ struct Sfondo: View {
         ZStack(alignment: .top) {
             Color.sfondoBase
             MeshGradient(width: 3, height: 3, points: Self.punti, colors: colori)
-                .frame(height: 420)
+                .frame(height: 380)
                 .mask { LinearGradient(colors: [.black, .black.opacity(0.0)], startPoint: .top, endPoint: .bottom) }
-                .opacity(schema == .dark ? 0.50 : 0.30)
+                .opacity(schema == .dark ? 0.34 : 0.28)
                 .accessibilityHidden(true)
         }
         .ignoresSafeArea()

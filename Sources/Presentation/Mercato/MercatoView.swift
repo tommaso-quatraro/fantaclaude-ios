@@ -18,10 +18,10 @@ struct MercatoView: View {
         NavigationStack {
             ZStack {
                 Sfondo()
-                contenuto
-            }
-            .barraInAlto {
-                SelettoreSezioni(selezione: $vm.sezione).padding(.vertical, 6)
+                VStack(spacing: 8) {
+                    SelettoreSezioni(selezione: $vm.sezione)
+                    contenuto
+                }
             }
             .navigationTitle("Mercato")
             .ricercaGlobale()

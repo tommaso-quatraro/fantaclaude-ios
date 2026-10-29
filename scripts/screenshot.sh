@@ -37,11 +37,11 @@ PER_IPAD=(oggi oggi-fondo formazione formazione-fondo formazione-manuale formazi
 # SCATTI=completo: tutte le schermate, tutte le varianti (ci vuole quasi un'ora).
 SCATTI="${SCATTI:-completo}"
 if [ "$SCATTI" = "veloce" ]; then
-  TUTTE=(oggi formazione mercato-consigliati mercato-classifica giocatore scambi lega lega-aspetto)
+  TUTTE=(oggi oggi-fondo formazione formazione-fondo mercato-consigliati mercato-classifica giocatore giocatore-fondo scambi lega lega-aspetto)
   PER_CHIARO=(oggi formazione mercato-consigliati giocatore scambi lega)
   PER_TESTO_GRANDE=(oggi formazione giocatore)
   PRINCIPALI=(oggi formazione giocatore scambi lega)
-  PER_IPAD=(oggi formazione mercato-consigliati giocatore scambi lega)
+  PER_IPAD=(oggi formazione formazione-fondo mercato-consigliati giocatore scambi lega)
 fi
 
 scegli() {
@@ -122,6 +122,10 @@ spegni_simulatore() {
 IFS=$'\t' read -r UDID_IPHONE NOME_IPHONE IOS_IPHONE <<< "$(scegli iphone)"
 echo "iPhone: $NOME_IPHONE ($IOS_IPHONE) $UDID_IPHONE"
 avvia_simulatore "$UDID_IPHONE"
+# lancio di prova: il primo avvio è lento e la prima foto restava nera
+xcrun simctl launch "$UDID_IPHONE" "$ID_APP" -DEMO -AppleLanguages "(it)" -AppleLocale it_IT >/dev/null
+sleep 10
+xcrun simctl terminate "$UDID_IPHONE" "$ID_APP" >/dev/null 2>&1
 
 giro "$UDID_IPHONE" iphone_scuro scuro large "${TUTTE[@]}"
 giro "$UDID_IPHONE" iphone_chiaro chiaro large "${PER_CHIARO[@]}"

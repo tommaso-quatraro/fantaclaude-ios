@@ -34,17 +34,6 @@ extension View {
         }
     }
 
-    /// Barra fissa in alto che sta sopra i contenuti che scorrono (selettori di sezione): su iOS 26 con la sfumatura
-    /// morbida del bordo di scorrimento, prima con una striscia normale.
-    @ViewBuilder
-    func barraInAlto<B: View>(@ViewBuilder _ barra: () -> B) -> some View {
-        if #available(iOS 26.0, *) {
-            self.safeAreaBar(edge: .top) { barra() }
-        } else {
-            self.safeAreaInset(edge: .top, spacing: 0) { barra() }
-        }
-    }
-
     /// Bordi di scorrimento morbidi (iOS 26): i contenuti sfumano sotto le barre invece di tagliarsi.
     @ViewBuilder
     func bordiMorbidi() -> some View {
