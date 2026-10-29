@@ -10,6 +10,8 @@ struct Marchio: View {
     /// Lato del quadrato in cui è disegnato.
     var lato: CGFloat = 54
     var muove = false
+    /// Solo per le prove (fotografie): blocca il marchio a un momento del ciclo, da 0 a 1 (0,5 = tutto in 3-5-2).
+    var fermoAllaFase: Double? = nil
     @Environment(\.accessibilityReduceMotion) private var ridotto
     @Environment(\.colorScheme) private var schema
 
@@ -46,18 +48,19 @@ struct Marchio: View {
     private var coloreCapitano: Color { schema == .dark ? Tema.capitanoScuro : Tema.capitanoChiaro }
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: !muove || ridotto)) { contesto in
-            let t = (muove && !ridotto) ? contesto.date.timeIntervalSinceReferenceDate : 0
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: !muove || ridotto || fermoAllaFase != nil)) { contesto in
+            let attivo = fermoAllaFase != nil || (muove && !ridotto)
+            let t: Double = fermoAllaFase.map { $0 * Self.durata } ?? (attivo ? contesto.date.timeIntervalSinceReferenceDate : 0)
             Canvas { disegno, dimensione in
                 let k = Double(min(dimensione.width, dimensione.height)) / 120
                 for (i, p) in Self.punti.enumerated() {
-                    let f = muove && !ridotto ? Self.spostamento(fase: Self.fase(t, ritardo: Double(i) * Self.ritardoPerPunto)) : 0
+                    let f = attivo ? Self.spostamento(fase: Self.fase(t, ritardo: Double(i) * Self.ritardoPerPunto)) : 0
                     let cx = (p.x + p.dx * f) * k
                     let cy = (p.y + p.dy * f) * k
                     let r = Self.raggioPunto * k
                     disegno.fill(Path(ellipseIn: CGRect(x: cx - r, y: cy - r, width: 2 * r, height: 2 * r)), with: .color(colorePunti))
                 }
-                let pulsa = muove && !ridotto ? 1 + 0.18 * (1 - cos(2 * .pi * Self.fase(t))) / 2 : 1
+                let pulsa = attivo ? 1 + 0.18 * (1 - cos(2 * .pi * Self.fase(t))) / 2 : 1
                 let rc = Self.raggioCapitano * k * pulsa
                 disegno.fill(Path(ellipseIn: CGRect(x: 60 * k - rc, y: 50 * k - rc, width: 2 * rc, height: 2 * rc)), with: .color(coloreCapitano))
             }
