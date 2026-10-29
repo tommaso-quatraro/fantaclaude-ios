@@ -6,13 +6,12 @@ struct AggiornaDatiSezione: View {
 
     var body: some View {
         Button { Task { await vm.avvia() } } label: {
-            HStack(spacing: 8) {
-                if vm.inCorso { ProgressView() }
-                Label(vm.inCorso ? "Aggiornamento in corso…" : "Aggiorna i dati", systemImage: "arrow.triangle.2.circlepath")
-            }
-            .frame(minHeight: 44)
+            Label(vm.inCorso ? "Aggiornamento in corso…" : "Aggiorna i dati", systemImage: "arrow.triangle.2.circlepath")
+                .symbolEffect(.variableColor.iterative, isActive: vm.inCorso)
+                .frame(minHeight: 44)
         }
         .disabled(vm.inCorso)
+        .sensoryFeedback(trigger: vm.inCorso) { vecchio, nuovo in vecchio && !nuovo ? .success : nil }
         .accessibilityHint("Il server riscarica calendario, voti, probabili formazioni e quotazioni")
         if let m = vm.messaggio {
             Text(m).font(.footnote).foregroundStyle(vm.errori.isEmpty ? Color.secondary : Color.orange)
@@ -95,7 +94,7 @@ struct MovimentiView: View {
                 } else if let e = vm.caricatore.errore {
                     ErroreVista(messaggio: e) { Task { await vm.carica() } }
                 } else {
-                    ProgressView().frame(maxWidth: .infinity)
+                    ScheletroRighe(righe: 5).listRowBackground(Color.clear)
                 }
             }
             .scrollContentBackground(.hidden)
@@ -151,7 +150,7 @@ struct StagioneView: View {
                 } else if let e = vm.stato.errore {
                     ErroreVista(messaggio: e) { Task { await vm.carica() } }
                 } else {
-                    ProgressView().frame(maxWidth: .infinity)
+                    ScheletroRighe(righe: 5).listRowBackground(Color.clear)
                 }
             }
             .scrollContentBackground(.hidden)
