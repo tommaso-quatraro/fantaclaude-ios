@@ -65,7 +65,9 @@ struct GraficoPunti: View {
     var altezza: CGFloat = 44
     var conEtichette = true
     var massimo = 5
-    @Environment(\.widgetRenderingMode) private var modo
+    @Environment(\.widgetRenderingMode) private var modoSistema
+    @Environment(\.renderForzato) private var modoForzato
+    private var modo: WidgetRenderingMode { modoForzato ?? modoSistema }
 
     private var dati: [PuntiGiornata] {
         Array(giornate.filter { $0.fatti != nil || $0.attesi != nil }.sorted { $0.giornata < $1.giornata }.suffix(massimo))
@@ -144,7 +146,9 @@ struct RigaGiocatoreWidget: View {
 /// Il miglior scambio in poco spazio: con chi, chi dai e chi ricevi, quanto guadagni.
 struct ScambioCompatto: View {
     let scambio: ScambioWidget?
-    @Environment(\.widgetRenderingMode) private var modo
+    @Environment(\.widgetRenderingMode) private var modoSistema
+    @Environment(\.renderForzato) private var modoForzato
+    private var modo: WidgetRenderingMode { modoForzato ?? modoSistema }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
@@ -171,7 +175,9 @@ struct ScambioCompatto: View {
 /// Il miglior svincolo in poco spazio: chi entra, al posto di chi, quanto guadagni.
 struct SvincoloCompatto: View {
     let svincolo: SvincolatoWidget?
-    @Environment(\.widgetRenderingMode) private var modo
+    @Environment(\.widgetRenderingMode) private var modoSistema
+    @Environment(\.renderForzato) private var modoForzato
+    private var modo: WidgetRenderingMode { modoForzato ?? modoSistema }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {

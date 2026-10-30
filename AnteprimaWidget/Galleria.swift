@@ -82,7 +82,7 @@ struct RiquadroWidget<Contenuto: View>: View {
         let misura = MisureWidget.dimensione(famiglia)
         let blocco = MisureWidget.accessorio(famiglia)
         contenuto
-            .environment(\.widgetFamily, famiglia)
+            .environment(\.famigliaForzata, famiglia)
             .padding(blocco ? 0 : 16)
             .frame(width: misura.width, height: misura.height, alignment: .topLeading)
             .background {
@@ -127,7 +127,7 @@ struct Galleria: View {
                             VStack(alignment: .leading, spacing: 3) {
                                 Text(MisureWidget.nome(f)).font(.caption2).foregroundStyle(.secondary)
                                 RiquadroWidget(f) { DatiGalleria.vista(widget, voce: voce) }
-                                    .environment(\.widgetRenderingMode, render)
+                                    .environment(\.renderForzato, render)
                             }
                         }
                     }

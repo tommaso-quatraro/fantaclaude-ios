@@ -18,8 +18,12 @@ struct WidgetScambio: Widget {
 }
 
 struct VistaScambio: View {
-    @Environment(\.widgetFamily) private var famiglia
-    @Environment(\.widgetRenderingMode) private var modo
+    @Environment(\.widgetFamily) private var famigliaSistema
+    @Environment(\.famigliaForzata) private var famigliaForzata
+    private var famiglia: WidgetFamily { famigliaForzata ?? famigliaSistema }
+    @Environment(\.widgetRenderingMode) private var modoSistema
+    @Environment(\.renderForzato) private var modoForzato
+    private var modo: WidgetRenderingMode { modoForzato ?? modoSistema }
     let voce: Voce
 
     private var accessorio: Bool { famiglia == .accessoryRectangular || famiglia == .accessoryInline }
