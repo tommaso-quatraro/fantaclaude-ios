@@ -325,6 +325,8 @@ struct Oggi: Decodable {
     let daFare: [DaFareVoce]?
     /// true se la lega non ha ancora le rose: Oggi mostra il benvenuto con «Importa le rose». Facoltativo (server vecchio).
     let senzaRose: Bool?
+    /// I miei titolari consigliati per squadra: servono a evidenziare le partite in cui giocano. Facoltativo (server vecchio).
+    let mieiTitolari: MieiTitolari?
 }
 
 /// Una cosa da fare in Oggi: «Lautaro è in dubbio: sostituiscilo», «Aggiorna le rose», «Rinnova l'app»...
