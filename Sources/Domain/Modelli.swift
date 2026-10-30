@@ -363,6 +363,9 @@ struct OpzioneModulo: Decodable, Identifiable {
 
 struct LivelloRischio: Decodable, Identifiable {
     let rischio: Int
+    /// Id dello stile (-2...2, come `rischio`) e una riga che lo spiega: i server vecchi non li mandano.
+    let stile: Int?
+    let descrizione: String?
     let nome: String
     let modulo: String
     let punteggioAtteso: Double
@@ -379,6 +382,8 @@ struct Formazione: Decodable {
     let panchina: [Giocatore]
     let conProbabili: Bool?
     let livelli: [LivelloRischio]?
+    /// Lo stile da proporre per primo (di solito 0, «Equilibrata»).
+    let stileConsigliato: Int?
     let schede: [String: Giocatore]?
     let fuori: [Giocatore]?
     let senzaDati: [String]?
