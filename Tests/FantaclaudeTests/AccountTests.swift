@@ -135,7 +135,13 @@ final class ServerHTTPAccountTests: XCTestCase {
     }
 
     func test401DiUnAccessoSbagliatoNonAvvisaLApp() async throws {
-        ProtocolloFinto.gestore = { [unowned self] r in (risposta(r, 401), Data("{\"detail\": \"Nome utente o password non corretti\"}".utf8)) }
+        // Il finto internet è uno solo e condiviso: una richiesta rimasta in giro da un altro test (stesso indirizzo salvato nelle
+        // impostazioni) riceverebbe qui un 401 e farebbe partire l'avviso. Il 401 lo diamo SOLO alla richiesta di accesso.
+        ProtocolloFinto.gestore = { [unowned self] r in
+            r.url?.path == "/api/account/accedi"
+                ? (risposta(r, 401), Data("{\"detail\": \"Nome utente o password non corretti\"}".utf8))
+                : (risposta(r, 200), Data("{}".utf8))
+        }
         // Solo gli avvisi di QUESTO server: altri test (es. risposte strane a catena) lasciano 401 in coda sulla coda principale
         // e un avviso in ritardo di un altro test non c'entra con questo.
         let nessunAvviso = expectation(forNotification: .accessoRichiesto, object: nil) { n in n.userInfo?["server"] as? String == self.indirizzo }
