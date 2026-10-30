@@ -27,6 +27,7 @@ scatta() {
   if ! xcrun simctl io "$udid" screenshot "$file" >/dev/null 2>&1; then
     echo "ERRORE: scatto non riuscito ($etichetta / $nome)"; ERRORI=$((ERRORI + 1)); return
   fi
+  if [ "$(stat -f%z "$file" 2>/dev/null || echo 999999)" -lt 30000 ]; then sleep 5; xcrun simctl io "$udid" screenshot "$file" >/dev/null 2>&1; fi
   sips --resampleWidth "$larghezza" "$file" >/dev/null 2>&1
   echo "  $etichetta / $nome / $dati"
 }
