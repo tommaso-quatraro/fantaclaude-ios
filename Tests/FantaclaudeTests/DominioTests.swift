@@ -417,7 +417,8 @@ final class ImmagineDaIndirizzoTests: XCTestCase {
         let corpo = String(decoding: try XCTUnwrap(s.corpiInviati(a: "/api/squadre/immagine/da-url").first), as: UTF8.self)
         XCTAssertTrue(corpo.contains("\"squadra\":\"Gli Amici\""), corpo)
         XCTAssertTrue(corpo.contains("\"tipo\":\"stemma\""), corpo)
-        XCTAssertTrue(corpo.contains("https://esempio.invalid/stemma.png"), corpo)
+        let letto = try XCTUnwrap(JSONSerialization.jsonObject(with: try XCTUnwrap(s.corpiInviati(a: "/api/squadre/immagine/da-url").first)) as? [String: String])
+        XCTAssertEqual(letto["url"], "https://esempio.invalid/stemma.png")
     }
 
     func testUnIndirizzoSbagliatoNonArrivaAlServer() async {
