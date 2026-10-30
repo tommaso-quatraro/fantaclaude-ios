@@ -8,6 +8,7 @@ struct PacchettoWidget: WidgetBundle {
         WidgetOggi()
         WidgetFormazione()
         WidgetCruscotto()
+        WidgetLive()
         WidgetDubbi()
         WidgetRosa()
         WidgetPunti()

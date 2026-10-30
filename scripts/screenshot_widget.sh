@@ -53,7 +53,7 @@ avvia() {
   xcrun simctl terminate "$udid" "$ID_APP" >/dev/null 2>&1
 }
 
-TUTTI=(cruscotto formazione formazione-blocco punti punti-blocco scambio scambio-blocco oggi dubbi rosa crediti crediti-blocco stato-blocco)
+TUTTI=(cruscotto live live-blocco formazione formazione-blocco punti punti-blocco scambio scambio-blocco oggi dubbi rosa crediti crediti-blocco stato-blocco)
 
 IFS=$'\t' read -r UDID_IPHONE NOME_IPHONE IOS_IPHONE <<< "$(scegli iphone)"
 echo "iPhone: $NOME_IPHONE ($IOS_IPHONE)"

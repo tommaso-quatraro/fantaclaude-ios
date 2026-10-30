@@ -135,16 +135,19 @@ struct RiassuntoWidget: Decodable {
     /// Il miglior scambio e il miglior svincolo: solo se il server li aveva già in cache (se hanno una forma strana si ignorano).
     private var scambioLetto: Facoltativo<ScambioWidget>?
     private var svincolatoLetto: Facoltativo<SvincolatoWidget>?
+    private var liveLetto: Facoltativo<LiveWidget>?
     var mancano: [String]?
 
     var scambio: ScambioWidget? { scambioLetto?.valore }
     var svincolato: SvincolatoWidget? { svincolatoLetto?.valore }
+    var live: LiveWidget? { liveLetto?.valore }
 
     enum CodingKeys: String, CodingKey {
         case giornata, primaPartita, scadenza, oreMancanti, iniziata, conProbabili, squadra, creditiResidui, formazione, avvisi, rosa
         case squalificati, diffidati, rigoristi, diario, osservati, dati, mancano
         case scambioLetto = "scambio"
         case svincolatoLetto = "svincolato"
+        case liveLetto = "live"
     }
 
     /// Quando comincia la giornata (la scadenza della formazione).
@@ -302,5 +305,107 @@ extension RiassuntoWidget {
     /// Le giornate del diario che hanno i punti fatti, dalla più recente.
     var giornateGiocate: [PuntiGiornata] {
         (diario ?? []).filter { $0.fatti != nil }.sorted { $0.giornata > $1.giornata }
+    }
+}
+
+// MARK: Partite in diretta (campo `live` di /api/widget, copia piccola di GET /api/live). Tutto facoltativo: un client deve ignorare
+// stati e tipi nuovi e trattare «stato sconosciuto con un punteggio» come partita in corso.
+
+struct EventoLive: Decodable, Equatable {
+    var tipo: String?
+    var minuto: String?
+    var squadra: String?
+    var chi: String?
+}
+
+struct PartitaLive: Decodable, Equatable, Identifiable {
+    var casa: String?
+    var trasferta: String?
+    var data: String?
+    var stato: String?
+    var minuto: String?
+    var golCasa: Int?
+    var golTrasferta: Int?
+    var eventi: [EventoLive]?
+
+    var id: String { "\(casa ?? "?")-\(trasferta ?? "?")" }
+    var quando: Date? { Quando.data(data) }
+
+    /// In gioco ora (compresi intervallo e sospesa); uno stato nuovo con un punteggio conta come in corso.
+    var inGioco: Bool {
+        switch stato ?? "" {
+        case "primo_tempo", "secondo_tempo", "intervallo", "in_corso", "sospesa": return true
+        case "da_giocare", "finita", "rinviata", "": return false
+        default: return golCasa != nil && golTrasferta != nil
+        }
+    }
+
+    var finita: Bool { stato == "finita" }
+
+    /// «2–1», o «–» se non ci sono dati.
+    var punteggio: String {
+        guard let c = golCasa, let t = golTrasferta else { return "–" }
+        return "\(c)–\(t)"
+    }
+
+    /// Cosa scrivere accanto al punteggio: «34'», «Intervallo», «Finita», «18:30».
+    var etichetta: String {
+        switch stato ?? "" {
+        case "intervallo": return "Intervallo"
+        case "finita": return "Finita"
+        case "rinviata": return "Rinviata"
+        case "sospesa": return "Sospesa"
+        case "da_giocare", "": return quando.map { Quando.ora($0) } ?? "—"
+        default: return minuto ?? "In corso"
+        }
+    }
+
+    /// Frase per VoiceOver: «Inter 1, Roma 0, 34 minuti».
+    var frase: String {
+        let a = ColoriSquadra.sigla(casa), b = ColoriSquadra.sigla(trasferta)
+        guard golCasa != nil else { return "\(a) contro \(b), \(etichetta)" }
+        return "\(a) \(golCasa ?? 0), \(b) \(golTrasferta ?? 0), \(etichetta)"
+    }
+}
+
+struct LiveWidget: Decodable, Equatable {
+    var aggiornatoIl: String?
+    var fonte: String?
+    var inCorso: Int?
+    var partite: [PartitaLive]?
+}
+
+extension RiassuntoWidget {
+    /// Le partite da mostrare: prima quelle in gioco, poi quelle da giocare per orario, poi le finite.
+    var partiteLive: [PartitaLive] {
+        let tutte = live?.partite ?? []
+        func rango(_ p: PartitaLive) -> Int { p.inGioco ? 0 : (p.finita ? 2 : 1) }
+        return tutte.sorted { (rango($0), $0.quando ?? .distantFuture) < (rango($1), $1.quando ?? .distantFuture) }
+    }
+
+    var partiteInGioco: [PartitaLive] { partiteLive.filter(\.inGioco) }
+
+    /// La prossima partita da giocare (dopo adesso o iniziata da poco senza dati).
+    func prossimaPartita(dopo adesso: Date = Date()) -> PartitaLive? {
+        partiteLive.filter { !$0.inGioco && !$0.finita && $0.stato != "rinviata" && ($0.quando ?? .distantPast) > adesso.addingTimeInterval(-15 * 60) }
+            .min { ($0.quando ?? .distantFuture) < ($1.quando ?? .distantFuture) }
+    }
+
+    /// I miei titolari che giocano in questa partita: la mia rosa dice contro chi e se in casa.
+    func mieiTitolari(in p: PartitaLive) -> [GiocatoreWidget] {
+        let titolari = Set((formazione?.titolari ?? []).map(\.id))
+        return (rosa ?? []).filter { g in
+            guard titolari.contains(g.id) || g.titolare == true, let avv = g.avversario else { return false }
+            return g.inCasa == true ? (p.trasferta == avv) : (p.casa == avv)
+        }
+    }
+
+    /// true se ha senso aggiornare spesso: c'è una partita in gioco o sta per iniziare (da 10 minuti prima).
+    func finestraLive(adesso: Date = Date()) -> Bool {
+        if !partiteInGioco.isEmpty { return true }
+        return partiteLive.contains { p in
+            guard !p.finita, p.stato != "rinviata", let q = p.quando else { return false }
+            return q.timeIntervalSince(adesso) < 10 * 60 && adesso.timeIntervalSince(q) < 130 * 60
+        }
     }
 }

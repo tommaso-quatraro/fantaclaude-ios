@@ -106,6 +106,33 @@ struct VistaCruscotto: View {
         }
     }
 
+    /// Le partite in corso (con i miei titolari) o, se non ce ne sono, la prossima da giocare.
+    @ViewBuilder
+    private func live(_ w: RiassuntoWidget, lato: CGFloat = 16) -> some View {
+        let inGioco = w.partiteInGioco
+        let mostra: [PartitaLive] = inGioco.isEmpty ? (w.prossimaPartita(dopo: voce.date).map { [$0] } ?? []) : Array(inGioco.prefix(2))
+        if !mostra.isEmpty {
+            VStack(alignment: .leading, spacing: 3) {
+                TitoloBlocco(testo: inGioco.isEmpty ? "Prossima partita" : "In corso", icona: "soccerball")
+                ForEach(mostra) { p in
+                    RigaPartitaLive(p: p, miei: inGioco.isEmpty ? [] : w.mieiTitolari(in: p), lato: lato)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    /// Durante le partite il posto di scambio e svincolo lo prende il live.
+    @ViewBuilder
+    private func liveOScambio(_ w: RiassuntoWidget) -> some View {
+        if w.partiteInGioco.isEmpty {
+            live(w)
+            scambioESvincolo(w)
+        } else {
+            live(w)
+        }
+    }
+
     private func punti(_ w: RiassuntoWidget, altezza: CGFloat) -> some View {
         Link(destination: Vai.url("lega")) {
             VStack(alignment: .leading, spacing: 3) {
@@ -147,7 +174,7 @@ struct VistaCruscotto: View {
                     .frame(width: 150)
                 dubbi(w, massimo: 3)
             }
-            scambioESvincolo(w)
+            liveOScambio(w)
             HStack(alignment: .bottom, spacing: 12) {
                 punti(w, altezza: 34)
                 crediti(w)
@@ -172,7 +199,7 @@ struct VistaCruscotto: View {
             .frame(maxWidth: .infinity)
             VStack(alignment: .leading, spacing: 10) {
                 dubbi(w, massimo: 3, lato: 28)
-                scambioESvincolo(w)
+                liveOScambio(w)
                 HStack(alignment: .bottom, spacing: 12) {
                     punti(w, altezza: 44)
                     crediti(w)
