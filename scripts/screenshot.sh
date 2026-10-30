@@ -38,11 +38,11 @@ PER_IPAD=(oggi oggi-fondo formazione formazione-fondo formazione-manuale formazi
 # SCATTI=completo: tutte le schermate, tutte le varianti (ci vuole quasi un'ora).
 SCATTI="${SCATTI:-completo}"
 if [ "$SCATTI" = "veloce" ]; then
-  TUTTE=(accesso-accedi accesso-codice accesso-rete accesso-limite accesso-non-valido oggi formazione lega)
-  PER_CHIARO=(accesso-accedi accesso-limite oggi)
+  TUTTE=(oggi formazione giocatore mercato-classifica lega-aspetto accesso-accedi accesso-limite)
+  PER_CHIARO=(oggi giocatore)
   PER_TESTO_GRANDE=(accesso-accedi)
   PRINCIPALI=(oggi lega)
-  PER_IPAD=(accesso-accedi accesso-account oggi)
+  PER_IPAD=(formazione giocatore)
 fi
 
 scegli() {
