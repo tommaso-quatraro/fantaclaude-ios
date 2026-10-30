@@ -94,10 +94,11 @@ struct VistaWidget: View {
 
     private var senzaDati: some View {
         VStack(spacing: 4) {
-            Image(systemName: "wifi.exclamationmark")
-            Text("Nessun dato").font(.caption.bold())
+            Image(systemName: voce.accessoRichiesto ? "person.crop.circle.badge.questionmark" : "wifi.exclamationmark")
+            Text(voce.accessoRichiesto ? "Serve l'accesso" : "Nessun dato").font(.caption.bold())
             if !accessorio {
-                Text("Apri Undici con Tailscale acceso").font(.caption2).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                Text(voce.accessoRichiesto ? "Apri Undici per accedere" : "Apri Undici con Tailscale acceso")
+                    .font(.caption2).foregroundStyle(.secondary).multilineTextAlignment(.center)
             }
         }
     }
