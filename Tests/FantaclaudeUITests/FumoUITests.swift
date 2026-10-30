@@ -100,10 +100,10 @@ final class FumoUITests: XCTestCase {
         let ingranaggio = app.buttons["Impostazioni"]
         XCTAssertTrue(ingranaggio.waitForExistence(timeout: 20), "l'ingranaggio sta accanto alla lente")
         ingranaggio.tap()
-        for voce in ["Aspetto", "Icona dell'app"] {
+        for voce in ["Tema, colore e densità", "Icona dell'app"] {
             attendiScorrendo(voce, contiene: true)
         }
-        elemento("Aspetto").tap()
+        elemento("Tema, colore e densità").tap()
         attendi("Colore principale")
         attendiScorrendo("Animazioni ridotte", contiene: true)
     }
