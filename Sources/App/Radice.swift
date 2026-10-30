@@ -139,6 +139,10 @@ struct RadiceView: View {
         .environment(\.apriGiocatore) { nav.apriScheda($0) }
         .environment(\.vaiASezione) { nav.sezione = $0 }
         .environment(\.apriImpostazioni) { nav.impostazioniAperte = true }
+        .environment(\.apriRosaDi) { nome in
+            modello.lega.percorso = [.squadre, .rosa(nome)]
+            nav.sezione = .lega
+        }
         .environment(\.apriImportazione) {
             modello.lega.percorso = [.importa]
             nav.sezione = .lega

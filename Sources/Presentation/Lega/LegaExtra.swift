@@ -79,6 +79,20 @@ final class RosaViewModel: ViewModelBase {
 
     func carica() async { await caricatore.ricarica() }
 
+    /// Lo stemma o la maglia da un indirizzo web: lo scarica il server.
+    func inviaDaIndirizzo(_ indirizzo: String, tipo: String) async {
+        inCorso = true
+        defer { inCorso = false }
+        do {
+            try await Immagini.condivise.inviaDaIndirizzo(indirizzo, squadra: nome, tipo: tipo)
+            messaggio = tipo == "stemma" ? "Stemma aggiornato." : "Maglia aggiornata."
+            Haptics.esito(riuscito: true)
+        } catch {
+            messaggio = error.localizedDescription
+            Haptics.esito(riuscito: false)
+        }
+    }
+
     /// Manda al server lo stemma («stemma») o la maglia («maglia») scelti dalla libreria foto.
     func inviaImmagine(_ dati: Data, tipo: String) async {
         inCorso = true
@@ -158,6 +172,8 @@ struct RosaView: View {
     @ObservedObject private var immagini = Immagini.condivise
     @State private var sceltaStemma: PhotosPickerItem?
     @State private var sceltaMaglia: PhotosPickerItem?
+    @State private var chiediIndirizzo = false
+    @State private var indirizzoScritto = ""
 
     init(nome: String, server: any ServerClient) {
         self.nome = nome
@@ -200,6 +216,15 @@ struct RosaView: View {
         .navigationBarTitleDisplayMode(.inline)
         .ricercaGlobale()
         .task { await vm.carica() }
+        .alert("Indirizzo dell'immagine", isPresented: $chiediIndirizzo) {
+            TextField("https://…", text: $indirizzoScritto)
+                .textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL)
+            Button("Usa come stemma") { Task { await vm.inviaDaIndirizzo(indirizzoScritto, tipo: "stemma") } }
+            Button("Usa come divisa") { Task { await vm.inviaDaIndirizzo(indirizzoScritto, tipo: "maglia") } }
+            Button("Annulla", role: .cancel) {}
+        } message: {
+            Text("Solo indirizzi https di un'immagine (stemma o divisa della tua squadra).")
+        }
         .onChange(of: sceltaStemma) { _, nuovo in
             guard let nuovo else { return }
             Task { await carica(nuovo, tipo: "stemma"); sceltaStemma = nil }
@@ -232,6 +257,12 @@ struct RosaView: View {
             if r.mia != true {
                 Button { vediFormazione(nome) } label: { Label("Formazione consigliata per loro", systemImage: "sportscourt").frame(minHeight: 44) }
             }
+            Button { indirizzoScritto = ""; chiediIndirizzo = true } label: {
+                Label("Da un indirizzo web", systemImage: "link").frame(minHeight: 44)
+            }
+            .disabled(vm.inCorso)
+            Text("Dall'app o dal sito di Leghe tieni premuto sullo stemma o sulla divisa e scegli «Salva immagine» (oppure copia l'indirizzo dell'immagine), poi incollalo qui. Se l'indirizzo non è pubblico, salva l'immagine e caricala dalla libreria foto.")
+                .font(.footnote).foregroundStyle(.secondary)
             if let m = vm.messaggio { Text(m).font(.footnote).foregroundStyle(.secondary) }
             ForEach(r.avvisi ?? [], id: \.self) { Label($0, systemImage: "exclamationmark.triangle").font(.footnote).foregroundStyle(Color.attenzione) }
         }

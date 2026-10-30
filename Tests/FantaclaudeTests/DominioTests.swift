@@ -390,3 +390,45 @@ final class DaFareTests: XCTestCase {
         XCTAssertEqual(OggiRepository.percorso(giorniCertificato: -2), "/api/oggi?certificato_giorni=-2")
     }
 }
+
+/// Stemma e divisa da un indirizzo web.
+@MainActor
+final class ImmagineDaIndirizzoTests: XCTestCase {
+    func testGliIndirizziAccettabili() {
+        XCTAssertEqual(IndirizzoImmagine.pulito("  https://esempio.invalid/stemma.png \n"), "https://esempio.invalid/stemma.png")
+        XCTAssertTrue(IndirizzoImmagine.valido("https://cdn.esempio.invalid/a/b.jpg?x=1"))
+        XCTAssertFalse(IndirizzoImmagine.valido("http://esempio.invalid/a.png"), "solo https")
+        XCTAssertFalse(IndirizzoImmagine.valido("ftp://esempio.invalid/a.png"))
+        XCTAssertFalse(IndirizzoImmagine.valido("https://utente:pw@esempio.invalid/a.png"), "niente credenziali dentro l'indirizzo")
+        XCTAssertFalse(IndirizzoImmagine.valido("https://localhost/a.png"), "un nome senza punto non e' pubblico")
+        XCTAssertFalse(IndirizzoImmagine.valido(""))
+        XCTAssertFalse(IndirizzoImmagine.valido("non un indirizzo"))
+        XCTAssertFalse(IndirizzoImmagine.valido("https://esempio.invalid/" + String(repeating: "a", count: 2100)))
+    }
+
+    func testIlServerRiceveIlCorpoGiusto() async throws {
+        let s = ServerDiProva { metodo, percorso, _ in
+            if metodo == "POST", percorso == "/api/squadre/immagine/da-url" { return Data(#"{"ok": true}"#.utf8) }
+            if percorso.hasPrefix("/api/squadre/immagini") || percorso.hasPrefix("/api/foto-disponibili") { return Data("{}".utf8) }
+            return Data("{}".utf8)
+        }
+        let immagini = Immagini(server: s)
+        try await immagini.inviaDaIndirizzo("https://esempio.invalid/stemma.png", squadra: "Gli Amici", tipo: "stemma")
+        let corpo = String(decoding: try XCTUnwrap(s.corpiInviati(a: "/api/squadre/immagine/da-url").first), as: UTF8.self)
+        XCTAssertTrue(corpo.contains("\"squadra\":\"Gli Amici\""), corpo)
+        XCTAssertTrue(corpo.contains("\"tipo\":\"stemma\""), corpo)
+        XCTAssertTrue(corpo.contains("https://esempio.invalid/stemma.png"), corpo)
+    }
+
+    func testUnIndirizzoSbagliatoNonArrivaAlServer() async {
+        let s = ServerDiProva { _, _, _ in Data("{}".utf8) }
+        let immagini = Immagini(server: s)
+        do {
+            try await immagini.inviaDaIndirizzo("http://esempio.invalid/a.png", squadra: "X", tipo: "maglia")
+            XCTFail("doveva lanciare")
+        } catch {
+            XCTAssertTrue(error.localizedDescription.contains("https://"))
+        }
+        XCTAssertEqual(s.quante("da-url"), 0)
+    }
+}
