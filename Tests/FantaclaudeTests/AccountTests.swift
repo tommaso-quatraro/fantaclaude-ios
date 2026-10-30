@@ -136,7 +136,9 @@ final class ServerHTTPAccountTests: XCTestCase {
 
     func test401DiUnAccessoSbagliatoNonAvvisaLApp() async throws {
         ProtocolloFinto.gestore = { [unowned self] r in (risposta(r, 401), Data("{\"detail\": \"Nome utente o password non corretti\"}".utf8)) }
-        let nessunAvviso = expectation(forNotification: .accessoRichiesto, object: nil)
+        // Solo gli avvisi di QUESTO server: altri test (es. risposte strane a catena) lasciano 401 in coda sulla coda principale
+        // e un avviso in ritardo di un altro test non c'entra con questo.
+        let nessunAvviso = expectation(forNotification: .accessoRichiesto, object: nil) { n in n.userInfo?["server"] as? String == self.indirizzo }
         nessunAvviso.isInverted = true
         do {
             _ = try await server.corpoJSON("POST", "/api/account/accedi", ["nome_utente": "x"])
