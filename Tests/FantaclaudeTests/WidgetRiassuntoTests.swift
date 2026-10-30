@@ -99,6 +99,32 @@ final class WidgetRiassuntoTests: XCTestCase {
         XCTAssertEqual(r.probabili, true)
     }
 
+    func testIlMiglioreScambioSiLegge() throws {
+        let s = try XCTUnwrap(try riassunto().scambio)
+        XCTAssertEqual(s.altra, "Real Madrink")
+        XCTAssertEqual(s.daiTesto, "A")
+        XCTAssertEqual(s.ricevoTesto, "B")
+        XCTAssertEqual(s.guadagnoLoro, 1.1)
+        XCTAssertTrue(s.frase.contains("Real Madrink"))
+    }
+
+    func testUnoScambioStranoNonRompeIlResto() throws {
+        // «do» e' un numero invece di un elenco: lo scambio si ignora, il resto del riassunto resta.
+        let strano = #"{"giornata": 4, "formazione": {"modulo": "4-3-3"}, "scambio": {"altra": "X", "do": 5}, "svincolato": "no"}"#
+        let w = try XCTUnwrap(RiassuntoWidget.leggi(Data(strano.utf8)))
+        XCTAssertEqual(w.giornata, 4)
+        XCTAssertEqual(w.formazione?.modulo, "4-3-3")
+        XCTAssertNil(w.scambio)
+        XCTAssertNil(w.svincolato)
+    }
+
+    func testLeGiornateGiocateDalDiario() throws {
+        let w = try riassunto()
+        XCTAssertEqual(w.giornateGiocate.map(\.giornata), [10, 9], "dalla piu' recente")
+        XCTAssertEqual(try XCTUnwrap(w.giornateGiocate.first).scarto, -2.5)
+        XCTAssertEqual(try XCTUnwrap(w.giornateGiocate.first).descrizione, "Giornata 10: 63,5 punti fatti, 66,0 attesi")
+    }
+
     func testIlCognome() {
         XCTAssertEqual(GiocatoreWidget(id: 1, nome: "Alessandro Bastoni").cognome, "Bastoni")
         XCTAssertEqual(GiocatoreWidget(id: 1, nome: "Pedro").cognome, "Pedro")

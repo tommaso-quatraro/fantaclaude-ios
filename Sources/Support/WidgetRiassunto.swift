@@ -79,6 +79,37 @@ struct SvincolatoWidget: Codable, Equatable {
     var fattibile: Bool?
 }
 
+/// Un pezzo facoltativo del riassunto: se ha una forma inattesa diventa nil invece di far fallire tutto il resto.
+struct Facoltativo<T: Decodable>: Decodable {
+    let valore: T?
+    init(from decoder: Decoder) throws { valore = try? T(from: decoder) }
+}
+
+/// Un giocatore dentro uno scambio proposto (tutti i campi sono facoltativi).
+struct GiocatoreScambio: Decodable, Equatable {
+    var id: Int?
+    var nome: String?
+    var ruolo: String?
+    var squadra: String?
+    var quotazione: Double?
+
+    var cognome: String { (nome ?? "").split(separator: " ").last.map(String.init) ?? (nome ?? "—") }
+    /// Il giocatore nella forma usata dai volti.
+    var comeGiocatore: GiocatoreWidget { GiocatoreWidget(id: id ?? 0, nome: nome ?? "—", ruolo: ruolo) }
+}
+
+/// Il miglior scambio con un'altra squadra (solo se il server lo aveva già calcolato). Il guadagno è in punti attesi.
+struct ScambioWidget: Decodable, Equatable {
+    var mia: String?
+    var altra: String?
+    var `do`: [GiocatoreScambio]?
+    var ricevo: [GiocatoreScambio]?
+    var guadagnoMio: Double?
+    var guadagnoLoro: Double?
+    var percentualeMio: Double?
+    var valido: Bool?
+}
+
 struct DatiAggiornamentoWidget: Codable, Equatable {
     var ultimoAggiornamento: String?
 }
@@ -101,10 +132,20 @@ struct RiassuntoWidget: Decodable {
     var diario: [PuntiGiornata]?
     var osservati: [GiocatoreWidget]?
     var dati: DatiAggiornamentoWidget?
-    /// Il miglior scambio e il miglior svincolo: solo se il server li aveva già in cache.
-    var scambio: PropostaScambio?
-    var svincolato: SvincolatoWidget?
+    /// Il miglior scambio e il miglior svincolo: solo se il server li aveva già in cache (se hanno una forma strana si ignorano).
+    private var scambioLetto: Facoltativo<ScambioWidget>?
+    private var svincolatoLetto: Facoltativo<SvincolatoWidget>?
     var mancano: [String]?
+
+    var scambio: ScambioWidget? { scambioLetto?.valore }
+    var svincolato: SvincolatoWidget? { svincolatoLetto?.valore }
+
+    enum CodingKeys: String, CodingKey {
+        case giornata, primaPartita, scadenza, oreMancanti, iniziata, conProbabili, squadra, creditiResidui, formazione, avvisi, rosa
+        case squalificati, diffidati, rigoristi, diario, osservati, dati, mancano
+        case scambioLetto = "scambio"
+        case svincolatoLetto = "svincolato"
+    }
 
     /// Quando comincia la giornata (la scadenza della formazione).
     var inizio: Date? { Quando.data(scadenza) }
@@ -217,5 +258,49 @@ enum MemoriaWidget {
     static func dimentica() {
         if let url = percorso() { try? FileManager.default.removeItem(at: url) }
         UserDefaults.standard.removeObject(forKey: chiave)
+    }
+}
+
+// MARK: Testi e calcoli dei widget (qui perche' si provano con i test; i disegni stanno in WidgetSources)
+
+extension PuntiGiornata {
+    /// Punti fatti meno punti attesi; nil se manca uno dei due.
+    var scarto: Double? {
+        guard let attesi, let fatti else { return nil }
+        return fatti - attesi
+    }
+
+    /// Una frase per VoiceOver: «Giornata 10: 63,5 punti fatti, 66,0 attesi».
+    var descrizione: String {
+        var t = "Giornata \(giornata): "
+        t += fatti.map { "\(Formato.punti($0)) punti fatti" } ?? "punti fatti non noti"
+        if let attesi { t += ", \(Formato.punti(attesi)) attesi" }
+        return t
+    }
+}
+
+extension ScambioWidget {
+    /// «Giovanni Rossi, Mario Bianchi» -> «Rossi, Bianchi»
+    static func cognomi(_ elenco: [GiocatoreScambio]?) -> String {
+        let nomi = (elenco ?? []).map(\.cognome)
+        return nomi.isEmpty ? "—" : nomi.joined(separator: ", ")
+    }
+
+    var daiTesto: String { Self.cognomi(`do`) }
+    var ricevoTesto: String { Self.cognomi(ricevo) }
+
+    /// Una frase per VoiceOver.
+    var frase: String {
+        var t = "Scambio con \(altra ?? "un'altra squadra"): dai \(daiTesto), ricevi \(ricevoTesto)."
+        if let g = guadagnoMio { t += " Per te \(Formato.conSegno(g)) punti attesi." }
+        if let g = guadagnoLoro { t += " Per loro \(Formato.conSegno(g))." }
+        return t
+    }
+}
+
+extension RiassuntoWidget {
+    /// Le giornate del diario che hanno i punti fatti, dalla più recente.
+    var giornateGiocate: [PuntiGiornata] {
+        (diario ?? []).filter { $0.fatti != nil }.sorted { $0.giornata > $1.giornata }
     }
 }
