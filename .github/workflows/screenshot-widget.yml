@@ -35,11 +35,11 @@ jobs:
         run: xcodegen generate
       - name: Compila per il simulatore (senza firma)
         run: |
-          set -o pipefail
+          set +e
           xcodebuild -project Fantaclaude.xcodeproj -scheme AnteprimaWidget -configuration Debug \
             -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath build \
             build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" ARCHS=arm64 \
-            2>&1 | tee build.log | tail -n 40
+            > build.log 2>&1 || { grep -E "error:" build.log | sort -u | head -30; exit 1; }
           test -d build/Build/Products/Debug-iphonesimulator/AnteprimaWidget.app
       - name: Scatta le fotografie
         run: bash scripts/screenshot_widget.sh build/Build/Products/Debug-iphonesimulator/AnteprimaWidget.app screenshot-widget
