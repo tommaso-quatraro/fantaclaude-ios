@@ -266,6 +266,7 @@ final class DominioTests: XCTestCase {
         XCTAssertEqual(vai("fantaclaude://lega"), .sezione(.lega))
         XCTAssertEqual(vai("FANTACLAUDE://Lega"), .sezione(.lega), "maiuscole e minuscole non contano")
         XCTAssertEqual(vai("fantaclaude://giocatore/203"), .giocatore(203))
+        XCTAssertEqual(vai("fantaclaude://impostazioni"), .impostazioni)
         XCTAssertNil(vai("fantaclaude://giocatore/abc"))
         XCTAssertNil(vai("fantaclaude://giocatore/0"))
         XCTAssertNil(vai("fantaclaude://giocatore"))
