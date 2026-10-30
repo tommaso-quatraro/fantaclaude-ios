@@ -307,6 +307,65 @@ struct Oggi: Decodable {
     let avvisi: [Avviso]?
     let migliori: [Giocatore]?
     let partite: [Partita]?
+    /// Le cose da fare (max 8, dal server): un pulsante per riga con il suo collegamento. Facoltativo (server vecchio).
+    let daFare: [DaFareVoce]?
+}
+
+/// Una cosa da fare in Oggi: «Lautaro è in dubbio: sostituiscilo», «Aggiorna le rose», «Rinnova l'app»...
+struct DaFareVoce: Decodable, Identifiable, Equatable {
+    let id: String
+    /// dubbio, formazione, svincolato, scambio, rose, certificato, diario, backup, server, primo_avvio
+    let tipo: String?
+    let testo: String
+    /// 1 = urgente ... 3 = quando puoi.
+    let priorita: Int?
+    /// Cosa dice il pulsante («Sostituisci», «Vedi»...).
+    let azione: String?
+    let destinazione: DestinazioneDaFare?
+
+    private enum Chiavi: String, CodingKey { case id, tipo, testo, priorita, azione, destinazione }
+
+    init(from decoder: Decoder) throws {
+        let k = try decoder.container(keyedBy: Chiavi.self)
+        // l'id può essere un testo o un numero: si legge in tutti e due i modi
+        if let t = try? k.decode(String.self, forKey: .id) { id = t }
+        else if let n = try? k.decode(Int.self, forKey: .id) { id = String(n) }
+        else { id = UUID().uuidString }
+        tipo = try? k.decodeIfPresent(String.self, forKey: .tipo)
+        testo = (try? k.decode(String.self, forKey: .testo)) ?? ""
+        priorita = try? k.decodeIfPresent(Int.self, forKey: .priorita)
+        azione = try? k.decodeIfPresent(String.self, forKey: .azione)
+        destinazione = try? k.decodeIfPresent(DestinazioneDaFare.self, forKey: .destinazione)
+    }
+
+    init(id: String, tipo: String? = nil, testo: String, priorita: Int? = nil, azione: String? = nil, destinazione: DestinazioneDaFare? = nil) {
+        self.id = id; self.tipo = tipo; self.testo = testo; self.priorita = priorita; self.azione = azione; self.destinazione = destinazione
+    }
+}
+
+struct DestinazioneDaFare: Decodable, Equatable {
+    let scheda: String?
+    let sezione: String?
+    /// `fantaclaude://...`
+    let link: String?
+
+    init(scheda: String? = nil, sezione: String? = nil, link: String? = nil) { self.scheda = scheda; self.sezione = sezione; self.link = link }
+
+    /// Dove porta: prima il collegamento `fantaclaude://`, poi la sezione scritta a parole; altrimenti da nessuna parte.
+    var destinazione: Destinazione? {
+        if let link, let url = URL(string: link), let d = Collegamenti.interpreta(url) { return d }
+        if let sezione, let s = Sezione(rawValue: sezione.lowercased()) { return .sezione(s) }
+        return nil
+    }
+}
+
+extension Oggi {
+    /// Le cose da fare in ordine di urgenza (a parità, l'ordine del server), senza voci vuote.
+    var cosePerOrdine: [DaFareVoce] {
+        (daFare ?? []).enumerated().filter { !$0.element.testo.isEmpty }
+            .sorted { ($0.element.priorita ?? 3, $0.offset) < ($1.element.priorita ?? 3, $1.offset) }
+            .map(\.element)
+    }
 }
 
 struct OpzioneModulo: Decodable, Identifiable {
