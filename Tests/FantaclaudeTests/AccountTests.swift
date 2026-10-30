@@ -141,6 +141,10 @@ final class ServerHTTPAccountTests: XCTestCase {
                 ? (risposta(r, 401), Data("{\"detail\": \"Nome utente o password non corretti\"}".utf8))
                 : (risposta(r, 200), Data("{}".utf8))
         }
+        // Indirizzo solo di questo test: l'avviso di una richiesta rimasta in giro da un altro test (che usa l'indirizzo
+        // comune della classe) non può essere scambiato per uno nostro.
+        let mio = "https://prova-\(UUID().uuidString.lowercased()).invalid"
+        UserDefaults.standard.set(mio, forKey: "indirizzo")
         let visti = Scatola<[String]>()
         visti.valore = []
         let osservatore = NotificationCenter.default.addObserver(forName: .accessoRichiesto, object: nil, queue: .main) { n in
@@ -154,7 +158,7 @@ final class ServerHTTPAccountTests: XCTestCase {
             XCTAssertEqual(messaggio, "Nome utente o password non corretti")
         }
         try await Task.sleep(nanoseconds: 400_000_000)
-        let miei = (visti.valore ?? []).filter { $0.contains(indirizzo) }
+        let miei = (visti.valore ?? []).filter { $0.contains(mio) }
         XCTAssertTrue(miei.isEmpty, "avvisi arrivati: \(miei) (tutti: \(visti.valore ?? []))")
     }
 
