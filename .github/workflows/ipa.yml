@@ -40,6 +40,15 @@ jobs:
         run: |
           mkdir -p Payload
           cp -R build/Fantaclaude.xcarchive/Products/Applications/Fantaclaude.app Payload/
+          # App Group con l'Apple ID gratuito: i permessi (entitlements) vanno dentro i programmi dell'IPA non firmato, altrimenti
+          # SideStore non sa che servono e non registra il gruppo. ldid li incorpora (SideStore poi firma da capo).
+          brew install ldid > /dev/null 2>&1 || echo "ldid non installato: niente App Group nell'IPA"
+          if command -v ldid > /dev/null; then
+            ldid -SConfig/FantaclaudeWidget.entitlements Payload/Fantaclaude.app/PlugIns/FantaclaudeWidget.appex/FantaclaudeWidget || echo "ldid: widget non riuscito"
+            ldid -SConfig/Fantaclaude.entitlements Payload/Fantaclaude.app/Fantaclaude || echo "ldid: app non riuscito"
+            ldid -e Payload/Fantaclaude.app/Fantaclaude | grep -A2 application-groups || echo "ATTENZIONE: permessi non trovati nell'app"
+            ldid -e Payload/Fantaclaude.app/PlugIns/FantaclaudeWidget.appex/FantaclaudeWidget | grep -A2 application-groups || echo "ATTENZIONE: permessi non trovati nel widget"
+          fi
           zip -qry Fantaclaude.ipa Payload
           ls -la Fantaclaude.ipa
           # l'estensione del widget deve stare dentro l'app (PlugIns), con il suo eseguibile
