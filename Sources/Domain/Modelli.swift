@@ -268,6 +268,8 @@ struct RepartiScambio: Decodable {
 struct ProposteScambi: Decodable {
     let giornate: [Int]?
     let proposte: [PropostaScambio]
+    /// Quante ricerche restano oggi (facoltativo: server vecchio o amministratore).
+    let ricerche: LimiteRicerche?
 }
 
 struct FormazioneBreve: Decodable {
