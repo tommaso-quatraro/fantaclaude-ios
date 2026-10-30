@@ -89,7 +89,7 @@ struct ImpostazioniView: View {
 
     private var sezioneAspetto: some View {
         Section("Aspetto") {
-            NavigationLink(value: PaginaImpostazioni.aspetto) { Label("Aspetto", systemImage: "paintpalette").labelStyle(.voce(.pink)).frame(minHeight: 44) }
+            NavigationLink(value: PaginaImpostazioni.aspetto) { Label("Tema, colore e densità", systemImage: "paintpalette").labelStyle(.voce(.pink)).frame(minHeight: 44) }
             NavigationLink(value: PaginaImpostazioni.icona) { Label("Icona dell'app", systemImage: "app.badge").labelStyle(.voce(.purple)).frame(minHeight: 44) }
         }
     }

@@ -70,12 +70,11 @@ final class FumoUITests: XCTestCase {
     func testMercatoSezioni() {
         vaiA("Mercato")
         attendi("Svincolati che migliorano la squadra")
-        for sezione in ["Osservati", "Asta", "Classifica", "Calendario", "Cerca"] {
+        for sezione in ["Consigliati", "Giocatori", "Osservati", "Calendario"] {
             XCTAssertTrue(app.buttons[sezione].waitForExistence(timeout: 10), "manca la sezione \(sezione) del Mercato")
         }
-        app.buttons["Asta"].tap()
-        attendi("Piano per l'asta")
-        app.buttons["Classifica"].tap()
+        XCTAssertFalse(app.buttons["Asta"].exists, "l'asta sta in Lega")
+        app.buttons["Giocatori"].tap()
         attendi("Solo svincolati")
     }
 
@@ -100,10 +99,10 @@ final class FumoUITests: XCTestCase {
         let ingranaggio = app.buttons["Impostazioni"]
         XCTAssertTrue(ingranaggio.waitForExistence(timeout: 20), "l'ingranaggio sta accanto alla lente")
         ingranaggio.tap()
-        for voce in ["Aspetto", "Icona dell'app"] {
+        for voce in ["Tema, colore e densità", "Icona dell'app"] {
             attendiScorrendo(voce, contiene: true)
         }
-        elemento("Aspetto").tap()
+        elemento("Tema, colore e densità").tap()
         attendi("Colore principale")
         attendiScorrendo("Animazioni ridotte", contiene: true)
     }
