@@ -172,6 +172,8 @@ struct RosaView: View {
     @ObservedObject private var immagini = Immagini.condivise
     @State private var sceltaStemma: PhotosPickerItem?
     @State private var sceltaMaglia: PhotosPickerItem?
+    @State private var sceglieFile = false
+    @State private var tipoFile = "stemma"
     @State private var chiediIndirizzo = false
     @State private var indirizzoScritto = ""
 
@@ -216,6 +218,9 @@ struct RosaView: View {
         .navigationBarTitleDisplayMode(.inline)
         .ricercaGlobale()
         .task { await vm.carica() }
+        .fileImporter(isPresented: $sceglieFile, allowedContentTypes: [.image], allowsMultipleSelection: false) { risultato in
+            Task { await caricaDaFile(risultato, tipo: tipoFile) }
+        }
         .alert("Indirizzo dell'immagine", isPresented: $chiediIndirizzo) {
             TextField("https://…", text: $indirizzoScritto)
                 .textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL)
@@ -233,6 +238,20 @@ struct RosaView: View {
             guard let nuovo else { return }
             Task { await carica(nuovo, tipo: "maglia"); sceltaMaglia = nil }
         }
+    }
+
+    /// Un'immagine scelta con Files: letta, ridotta e mandata al server.
+    private func caricaDaFile(_ risultato: Result<[URL], Error>, tipo: String) async {
+        guard case .success(let urls) = risultato, let url = urls.first else {
+            if case .failure(let e) = risultato { vm.messaggio = e.localizedDescription }
+            return
+        }
+        guard let dati = try? await LetturaFile.leggi(url, massimo: 20 * 1024 * 1024), let immagine = UIImage(data: dati),
+              let pronti = immagine.datiPerServer() else {
+            vm.messaggio = "Non riesco a leggere l'immagine. Salvala su questo iPhone (Files > Sul mio iPhone) e riprova."
+            return
+        }
+        await vm.inviaImmagine(pronti, tipo: tipo)
     }
 
     /// Il giocatore scelto dalla libreria foto, ridotto e mandato al server.
@@ -257,6 +276,13 @@ struct RosaView: View {
             if r.mia != true {
                 Button { vediFormazione(nome) } label: { Label("Formazione consigliata per loro", systemImage: "sportscourt").frame(minHeight: 44) }
             }
+            Menu {
+                Button("Stemma da un file") { tipoFile = "stemma"; sceglieFile = true }
+                Button("Divisa da un file") { tipoFile = "maglia"; sceglieFile = true }
+            } label: {
+                Label("Da un file", systemImage: "folder").frame(minHeight: 44)
+            }
+            .disabled(vm.inCorso)
             Button { indirizzoScritto = ""; chiediIndirizzo = true } label: {
                 Label("Da un indirizzo web", systemImage: "link").frame(minHeight: 44)
             }

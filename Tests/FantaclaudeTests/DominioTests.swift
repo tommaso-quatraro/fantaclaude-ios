@@ -433,3 +433,34 @@ final class ImmagineDaIndirizzoTests: XCTestCase {
         XCTAssertEqual(s.quante("da-url"), 0)
     }
 }
+
+/// «Apri con Undici» per le immagini: stemma e divisa.
+@MainActor
+final class ImmagineRicevutaTests: XCTestCase {
+    func testQualiFileSonoImmagini() {
+        for nome in ["a.png", "b.JPG", "c.jpeg", "d.HEIC", "e.heif", "f.webp"] {
+            XCTAssertTrue(Navigazione.eImmagine(URL(fileURLWithPath: "/tmp/" + nome)), nome)
+        }
+        for nome in ["rose.xlsx", "rose.csv", "testo.txt", "senza-estensione", "film.mov"] {
+            XCTAssertFalse(Navigazione.eImmagine(URL(fileURLWithPath: "/tmp/" + nome)), nome)
+        }
+    }
+
+    func testUnaImmagineNonVaTraLeRose() {
+        let nav = Navigazione()
+        nav.apriFile(URL(fileURLWithPath: "/tmp/stemma.png"))
+        XCTAssertNotNil(nav.immagineRicevuta)
+        XCTAssertNil(nav.fileDaImportare, "uno stemma non e' un file delle rose")
+        let rose = Navigazione()
+        rose.apriFile(URL(fileURLWithPath: "/tmp/rose.xlsx"))
+        XCTAssertNil(rose.immagineRicevuta)
+        XCTAssertNotNil(rose.fileDaImportare)
+    }
+
+    func testUnIndirizzoWebNonEUnFile() {
+        let nav = Navigazione()
+        nav.apriFile(URL(string: "https://esempio.invalid/stemma.png")!)
+        XCTAssertNil(nav.immagineRicevuta)
+        XCTAssertNil(nav.fileDaImportare)
+    }
+}
