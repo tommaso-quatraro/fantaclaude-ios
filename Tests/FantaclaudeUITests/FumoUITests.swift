@@ -34,7 +34,7 @@ final class FumoUITests: XCTestCase {
     private func vaiA(_ sezione: String) {
         let barra = app.tabBars.firstMatch
         XCTAssertTrue(barra.waitForExistence(timeout: 30), "la barra delle sezioni deve comparire")
-        barra.buttons[sezione].tap()
+        barra.buttons[sezione].firstMatch.tap()   // con iOS 26 la barra a volte espone due elementi per la stessa scheda
     }
 
     func testLeCinqueSezioniSonoRaggiungibili() {
