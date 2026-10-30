@@ -24,7 +24,11 @@ struct FantaclaudeApp: App {
                 }
                 .onOpenURL { url in
                     // fantaclaude://formazione, fantaclaude://giocatore/12, ... (per esempio dal tocco su una notifica di ntfy)
-                    if let destinazione = Collegamenti.interpreta(url) { nav.vai(a: destinazione) }
+                    if url.isFileURL {
+                        nav.apriFile(url)   // un file delle rose da un'altra app
+                    } else if let destinazione = Collegamenti.interpreta(url) {
+                        nav.vai(a: destinazione)
+                    }
                 }
                 .onChange(of: fase) { _, nuova in
                     // Uscendo dall'app si chiede a iOS il prossimo aggiornamento in background.

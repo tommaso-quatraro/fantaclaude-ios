@@ -110,6 +110,15 @@ final class FumoUITests: XCTestCase {
         XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 10))
     }
 
+    func testUnCsvDelleRoseSiImportaDaUnAltraApp() {
+        // la demo scrive un CSV vero (separatore «;») e lo importa come se arrivasse da «Apri con Undici»
+        app.terminate()
+        app.launchArguments += ["-DEMO_SCHERMATA", "lega-importa-csv"]
+        app.launch()
+        attendi("Cosa è cambiato")
+        XCTAssertFalse(elemento("Usa un Excel (.xlsx), un CSV o un file di testo.").exists, "il CSV non deve essere rifiutato")
+    }
+
     func testLaLenteApreLaRicerca() {
         let lente = app.buttons["Cerca un giocatore"]
         XCTAssertTrue(lente.waitForExistence(timeout: 30), "la lente della ricerca deve esserci in Oggi")
