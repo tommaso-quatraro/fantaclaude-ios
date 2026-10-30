@@ -112,7 +112,7 @@ struct ScambiView: View {
             .pulsanteVetro(prominente: true)
             .disabled(vm.offertaInCorso)
             .sensoryFeedback(trigger: vm.esitoOfferta?.analisi?.id) { _, nuovo in nuovo != nil ? .success : nil }
-            if let e = vm.erroreOfferta { Text(e).font(.footnote).foregroundStyle(.orange) }
+            if let e = vm.erroreOfferta { Text(e).font(.footnote).foregroundStyle(Color.attenzione) }
             if let o = vm.esitoOfferta { esitoOfferta(o) }
         }
     }
@@ -126,7 +126,7 @@ struct ScambiView: View {
         }
         if let ambigui = o.ambigui, !ambigui.isEmpty {
             Label("Più giocatori con lo stesso cognome: \(ambigui.joined(separator: "; ")). Usa «Analizza uno scambio a mano» per sceglierli.", systemImage: "exclamationmark.triangle")
-                .font(.footnote).foregroundStyle(.orange)
+                .font(.footnote).foregroundStyle(Color.attenzione)
         }
         if let analisi = o.analisi {
             Text(ScambiLogica.giudizioOfferta(analisi)).font(.headline)
@@ -287,7 +287,7 @@ struct DettaglioScambio: View {
                         Text(["P": "Portieri", "D": "Difensori", "C": "Centrocampisti", "A": "Attaccanti"][r] ?? r)
                         Spacer()
                         Text("\(Formato.conSegno(x))%").bold().monospacedDigit()
-                            .foregroundStyle(x > 0.05 ? Color.verde : x < -0.05 ? Color.red : .primary)
+                            .foregroundStyle(x > 0.05 ? Color.verde : x < -0.05 ? Color.malus : .primary)
                     }
                     .accessibilityElement(children: .combine)
                 }
@@ -296,7 +296,7 @@ struct DettaglioScambio: View {
                         Text("In totale (prossime \(p.giornate?.count ?? 0) giornate)")
                         Spacer()
                         Text("\(Formato.conSegno(tot))%").bold().monospacedDigit()
-                            .foregroundStyle(tot > 0.05 ? Color.verde : tot < -0.05 ? Color.red : .primary)
+                            .foregroundStyle(tot > 0.05 ? Color.verde : tot < -0.05 ? Color.malus : .primary)
                     }
                     .accessibilityElement(children: .combine)
                 }
@@ -346,7 +346,7 @@ struct AnalizzaScambioView: View {
                         if vm.inCorso { ProgressView() } else { Text("Analizza").frame(minHeight: 44) }
                     }
                     .disabled(!vm.puoAnalizzare)
-                    if let errore = vm.errore { Text(errore).foregroundStyle(.orange) }
+                    if let errore = vm.errore { Text(errore).foregroundStyle(Color.attenzione) }
                 }
                 if let esito = vm.esito {
                     Section("Esito") { DettaglioScambio(p: esito, giudizio: ScambiLogica.giudizioAnalisi(esito)).listRowBackground(Color.clear) }
