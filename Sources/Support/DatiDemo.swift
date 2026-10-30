@@ -428,8 +428,7 @@ private enum DatiDemo {
              "rimandi": [["schermata": "diario", "etichetta": "Diario"], ["schermata": "stato-dati", "etichetta": "Stato dei dati"], ["schermata": "schermata-nuova", "etichetta": "Una schermata che l'app non conosce"]]],
             ["id": "formula-punti", "titolo": "La formula dei punti attesi", "livello": "nerd",
              "paragrafi": ["Somma dei contributi di ogni evento, pesati con la probabilità che accada."],
-             "formula": "punti = p_voto * (voto + bonus_gol * gol_attesi + bonus_assist * assist_attesi - malus * p_cartellino)
-fascia 80% = da atteso - 1,18 * scarto a atteso + 1,25 * scarto",
+             "formula": "punti = p_voto * (voto + bonus_gol * gol_attesi + bonus_assist * assist_attesi - malus * p_cartellino)\nfascia 80% = da atteso - 1,18 * scarto a atteso + 1,25 * scarto",
              "numeri": ["backtest.copertura_fascia"]],
         ]
         let glossario: [[String: Any]] = [
