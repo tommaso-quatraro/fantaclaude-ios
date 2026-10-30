@@ -44,6 +44,20 @@ struct GiocatoreWidget: Codable, Identifiable, Equatable {
     }
 }
 
+extension GiocatoreWidget {
+    /// «18:30», o «—» se la partita non è nota.
+    var oraBreve: String { quando.map { Quando.ora($0) } ?? "—" }
+
+    /// «vs ROM · 18:30» / «@ MIL · 18:30».
+    var partitaBreve: String {
+        guard let avversario else { return oraBreve }
+        return "\(inCasa == true ? "vs" : "@") \(ColoriSquadra.sigla(avversario)) · \(oraBreve)"
+    }
+
+    /// Il cognome (l'ultima parola), per i campi stretti.
+    var cognome: String { nome.split(separator: " ").last.map(String.init) ?? nome }
+}
+
 struct FormazioneWidget: Codable, Equatable {
     var modulo: String?
     var puntiAttesi: Double?
