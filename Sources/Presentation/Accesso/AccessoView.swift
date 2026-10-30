@@ -115,7 +115,9 @@ struct SchermataAccesso: View {
     private var testata: some View {
         VStack(spacing: 10) {
             Marchio(lato: 96, muove: sessione.inCorso)
-            MarchioConNome(lato: 40).accessibilityHidden(true)
+            Text("undici")
+                .font(.system(size: 34, weight: .semibold, design: .rounded))
+                .accessibilityHidden(true)
             Text(frase)
                 .font(.subheadline).foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
