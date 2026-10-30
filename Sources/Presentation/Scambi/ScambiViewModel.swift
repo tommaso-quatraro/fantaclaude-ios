@@ -13,18 +13,6 @@ enum ModoScambi: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
-/// Le ricerche di scambi che restano oggi (il server ne conta un numero al giorno; l'amministratore non ha limite: `tetto` nil).
-struct LimiteRicerche: Decodable, Equatable {
-    let restano: Int?
-    let tetto: Int?
-
-    /// «Ne restano 3 oggi su 20»; nil se non c'è un limite o non si sa.
-    var testo: String? {
-        guard let restano, let tetto else { return nil }
-        return "Ne \(restano == 1 ? "resta" : "restano") \(restano) oggi su \(tetto)"
-    }
-}
-
 /// Logica della schermata Scambi: proposte del modello, filtro per squadra e per scambi 2 contro 2.
 @MainActor
 final class ScambiViewModel: ViewModelBase {
