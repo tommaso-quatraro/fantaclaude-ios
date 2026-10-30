@@ -526,3 +526,36 @@ final class ConfiguraLegaTests: XCTestCase {
         XCTAssertFalse("Non riesco a raggiungere il server. Controlla che Tailscale sia attivo.".dicePerNessunaRosa)
     }
 }
+
+/// Nome visualizzato dell'utente e plurali.
+final class NomeEPluraliTests: XCTestCase {
+    func testSiMostraIlNomeVisualizzato() throws {
+        let r: RispostaAccount = try Decodifica.decodifica(Data(#"{"multiutente": true, "utente": {"id": 3, "nome_utente": "thebestoftommy", "nome_visualizzato": "TheBestOfTommy", "ruolo": "utente"}}"#.utf8))
+        let u = try XCTUnwrap(r.utente)
+        XCTAssertEqual(u.nome, "TheBestOfTommy")
+        XCTAssertEqual(u.nomeUtente, "thebestoftommy")
+    }
+
+    func testSenzaNomeVisualizzatoSiUsaIlNomeUtente() throws {
+        let r: RispostaAccount = try Decodifica.decodifica(Data(#"{"multiutente": true, "utente": {"id": 3, "nome_utente": "tommy", "ruolo": "utente"}}"#.utf8))
+        XCTAssertEqual(r.utente?.nome, "tommy")
+        XCTAssertEqual(Utente(id: 1, nomeUtente: "a", ruolo: "utente", creato: nil, nomeVisualizzato: "   ").nome, "a", "un nome vuoto non conta")
+    }
+
+    func testUnUtenteSalvatoPrimaDelNuovoCampoSiLegge() throws {
+        let vecchio = #"{"id": 1, "nomeUtente": "tommy", "ruolo": "utente"}"#
+        let u = try JSONDecoder().decode(Utente.self, from: Data(vecchio.utf8))
+        XCTAssertEqual(u.nome, "tommy")
+    }
+
+    func testIPlurali() {
+        XCTAssertEqual(Formato.crediti(1), "1 credito")
+        XCTAssertEqual(Formato.crediti(0), "0 crediti")
+        XCTAssertEqual(Formato.crediti(12), "12 crediti")
+        XCTAssertEqual(Formato.crediti(-1), "-1 credito")
+        XCTAssertEqual(Formato.giornate(1), "1 giornata")
+        XCTAssertEqual(Formato.giornate(5), "5 giornate")
+        XCTAssertEqual(Formato.giocatori(1), "1 giocatore")
+        XCTAssertEqual(Formato.plurale(2, "posto", "posti"), "2 posti")
+    }
+}
