@@ -54,7 +54,7 @@ final class AccessoUITests: XCTestCase {
     func testCodiceDiRecuperoSiVedeEsiConfermaPrimaDiProseguire() {
         avvia("codice")
         attendi("Salva il tuo codice di recupero")
-        attendi("K7M2P-XQ4NH-W8RTV", contiene: true)
+        attendi("K 7 M 2 P", contiene: true)   // per VoiceOver il codice si legge lettera per lettera
         let continua = app.buttons["Continua"]
         XCTAssertTrue(continua.waitForExistence(timeout: 10))
         XCTAssertFalse(continua.isEnabled, "senza la conferma «l'ho salvato» non si va avanti")

@@ -42,6 +42,7 @@ enum Demo {
             if accesso == "rose" {
                 // La lega non ha rose: il server risponde 409 «Nessuna rosa importata» a tutto quello che le richiede.
                 var senzaRose = FinteServer.demo
+                senzaRose.indirizzoFinto = "https://finto-senza-rose.invalid"   // niente copie salvate della lega di prova
                 senzaRose.errori = ["/api/oggi": "Nessuna rosa importata", "/api/formazione": "Nessuna rosa importata", "/api/stato": "Nessuna rosa importata"]
                 return senzaRose
             }

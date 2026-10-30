@@ -274,7 +274,9 @@ struct FinteServer: ServerClient {
     var binari: (@Sendable (String) -> Data?)? = nil
     /// Indirizzi (per prefisso) a cui il server finto risponde con un errore del server, col messaggio dato (per le demo).
     var errori: [String: String] = [:]
-    var indirizzo: String { "https://finto.invalid" }
+    /// L'indirizzo che dichiara (la cache su disco è per indirizzo: una demo con dati diversi ne usa uno suo).
+    var indirizzoFinto = "https://finto.invalid"
+    var indirizzo: String { indirizzoFinto }
 
     func richiesta(_ metodo: String, _ percorso: String, corpo: Data?) async throws -> Data {
         if let chiave = errori.keys.first(where: { percorso.hasPrefix($0) }), let messaggio = errori[chiave] { throw ErroreApi.server(messaggio) }
