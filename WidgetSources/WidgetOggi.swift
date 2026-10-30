@@ -177,6 +177,6 @@ struct VistaWidget: View {
     }
 
     private func riga(_ r: RiassuntoOggi) -> some View {
-        Label("Fanta \(r.modulo ?? "—"), \(puntiTesto(r)) punti", systemImage: "sportscourt")
+        Label("Undici \(r.modulo ?? "—"), \(puntiTesto(r)) punti", systemImage: "sportscourt")
     }
 }

@@ -224,6 +224,10 @@ final class SessioneAccount: ObservableObject {
         return nil
     }
 
+    /// Le funzioni dell'amministratore (aggiornare i dati del server, lo stato dei dati): sempre senza account, solo per
+    /// l'amministratore con gli account (agli altri il server risponde 403).
+    var puoAmministrare: Bool { !multiutente || (utente?.amministratore ?? false) }
+
     // MARK: stato
 
     /// Chiede al server chi sono (`GET /api/account/me`) e allinea lo stato. Se il server non risponde si resta dov'eravamo.
