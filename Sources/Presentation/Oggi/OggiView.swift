@@ -7,6 +7,8 @@ struct OggiView: View {
     @Environment(\.apriGiocatore) private var apri
     @Environment(\.vaiASezione) private var vaiASezione
     @Environment(\.apriNovita) private var apriNovita
+    @Environment(\.apriImpostazioni) private var apriImpostazioni
+    @EnvironmentObject private var nav: Navigazione
     /// L'ultima versione delle novità che l'utente ha guardato (la scrive la pagina Novità).
     @AppStorage("novitaVista") private var novitaVista = ""
     @State private var novitaAnimata = false
@@ -206,7 +208,7 @@ struct OggiView: View {
             Text(c.testo).font(.subheadline).fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 6)
             if let d = c.destinazione?.destinazione {
-                Button(c.azione ?? "Apri") { vaiA(d) }
+                Button(c.azione ?? "Apri") { vaiA(d, tipo: c.tipo) }
                     .font(.subheadline.weight(.semibold))
                     .buttonStyle(.bordered)
                     .tint(Color.verde)
@@ -218,9 +220,13 @@ struct OggiView: View {
     }
 
     /// Apre la destinazione di una cosa da fare.
-    private func vaiA(_ d: Destinazione) {
+    private func vaiA(_ d: Destinazione, tipo: String? = nil) {
         if case .sezione(let s) = d { vaiASezione(s) }
         else if case .giocatore(let id) = d { apri(id) }
+        else if case .impostazioni = d {
+            // «Riprendi» la configurazione guidata riapre la guida; le altre voci aprono le Impostazioni
+            if tipo == "primo_avvio" { nav.guidaAperta = true } else { apriImpostazioni?() }
+        }
     }
 
     static func iconaDaFare(_ tipo: String?) -> String {
@@ -364,4 +370,5 @@ struct OggiView: View {
 
 #Preview("Oggi") {
     OggiView(vm: OggiViewModel(server: FinteServer.esempio))
+        .environmentObject(Navigazione())
 }
