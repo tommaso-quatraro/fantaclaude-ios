@@ -73,6 +73,9 @@ struct VistaCruscotto: View {
                         .foregroundStyle(TintaWidget.accento(modo)).widgetAccentable()
                     Text("punti attesi").font(.caption2).foregroundStyle(TintaWidget.testo2)
                 }
+                if let t = f.intervallo?.testo {
+                    Text(t).font(.caption2).foregroundStyle(TintaWidget.testo2).lineLimit(1)
+                }
             }
         }
         .accessibilityElement(children: .combine)

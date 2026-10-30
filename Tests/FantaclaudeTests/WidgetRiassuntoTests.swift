@@ -154,6 +154,16 @@ final class WidgetRiassuntoTests: XCTestCase {
         XCTAssertEqual(w.prossimaPartita(dopo: prima)?.casa, "lazio")
     }
 
+    func testLIntervalloDeiPuntiAttesi() throws {
+        let c = #"{"giornata": 3, "formazione": {"modulo": "4-3-3", "punti_attesi": 70, "intervallo": {"basso": 62.2, "alto": 84.6, "confidenza": 0.8, "indicativo": true}}}"#
+        let i = try XCTUnwrap(try XCTUnwrap(RiassuntoWidget.leggi(Data(c.utf8))).formazione?.intervallo)
+        XCTAssertEqual(i.testo, "tra 62 e 85")
+        XCTAssertEqual(i.testoLungo, "tra 62 e 85 (8 volte su 10), indicativo")
+        XCTAssertNil(IntervalloWidget(basso: 60).testo, "senza l'estremo alto niente testo")
+        let senza = try XCTUnwrap(RiassuntoWidget.leggi(Data(#"{"giornata": 3, "formazione": {"modulo": "4-3-3"}}"#.utf8)))
+        XCTAssertNil(senza.formazione?.intervallo, "un server vecchio non lo manda")
+    }
+
     func testIlLiveMancanteOStranoNonRompe() throws {
         let senza = try XCTUnwrap(RiassuntoWidget.leggi(Data(#"{"giornata": 3}"#.utf8)))
         XCTAssertNil(senza.live)

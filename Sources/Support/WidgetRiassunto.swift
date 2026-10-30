@@ -63,6 +63,7 @@ struct FormazioneWidget: Codable, Equatable {
     var puntiAttesi: Double?
     var titolari: [GiocatoreWidget]?
     var panchina: [Int]?
+    var intervallo: IntervalloWidget?
 }
 
 struct PuntiGiornata: Codable, Equatable, Identifiable {
@@ -407,5 +408,28 @@ extension RiassuntoWidget {
             guard !p.finita, p.stato != "rinviata", let q = p.quando else { return false }
             return q.timeIntervalSince(adesso) < 10 * 60 && adesso.timeIntervalSince(q) < 130 * 60
         }
+    }
+}
+
+// MARK: Intervallo dei punti attesi (campo `intervallo` di /api/widget: «tra X e Y», 8 volte su 10)
+
+struct IntervalloWidget: Codable, Equatable {
+    var basso: Double?
+    var alto: Double?
+    var confidenza: Double?
+    /// true se il modello e' ancora poco provato: l'intervallo e' solo una stima.
+    var indicativo: Bool?
+
+    /// «tra 62 e 84», o nil se mancano i due estremi.
+    var testo: String? {
+        guard let basso, let alto, basso.isFinite, alto.isFinite else { return nil }
+        return "tra \(Formato.intero(basso)) e \(Formato.intero(alto))"
+    }
+
+    /// «tra 62 e 84 (8 volte su 10)», con «indicativo» se serve.
+    var testoLungo: String? {
+        guard let t = testo else { return nil }
+        let volte = Formato.intero((confidenza ?? 0.8) * 10)
+        return "\(t) (\(volte) volte su 10)" + (indicativo == true ? ", indicativo" : "")
     }
 }

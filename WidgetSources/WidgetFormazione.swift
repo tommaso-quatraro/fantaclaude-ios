@@ -131,6 +131,7 @@ struct VistaFormazione: View {
                 Text(f.modulo ?? "—").font(.system(size: 36, weight: .bold, design: .rounded)).minimumScaleFactor(0.6).lineLimit(1)
                 Text(punti(f)).font(.title3.bold()).monospacedDigit()
                 Text("punti attesi").font(.caption2).foregroundStyle(TintaWidget.testo2)
+                if let t = f.intervallo?.testo { Text(t).font(.caption2).foregroundStyle(TintaWidget.testo2).lineLimit(1) }
                 Spacer(minLength: 0)
                 if !w.daControllare.isEmpty {
                     Label("\(w.daControllare.count) da controllare", systemImage: "exclamationmark.triangle.fill")
@@ -147,6 +148,7 @@ struct VistaFormazione: View {
             HStack(alignment: .firstTextBaseline) {
                 Text(f.modulo ?? "—").font(.system(size: 34, weight: .bold, design: .rounded))
                 Text("\(punti(f)) punti attesi").font(.subheadline).monospacedDigit().foregroundStyle(TintaWidget.testo2)
+                if let t = f.intervallo?.testo { Text(t).font(.caption).foregroundStyle(TintaWidget.testo2).lineLimit(1) }
                 Spacer()
                 if let g = w.giornata { Text("Giornata \(g)").font(.caption).foregroundStyle(TintaWidget.testo2) }
             }
@@ -169,6 +171,7 @@ struct VistaFormazione: View {
                 HStack(alignment: .firstTextBaseline) {
                     Text(f.modulo ?? "—").font(.system(size: 40, weight: .bold, design: .rounded))
                     Text("\(punti(f)) punti attesi").font(.headline).monospacedDigit().foregroundStyle(TintaWidget.testo2)
+                    if let t = f.intervallo?.testo { Text(t).font(.subheadline).foregroundStyle(TintaWidget.testo2) }
                     Spacer()
                 }
                 CampoMini(titolari: tit, lato: 48, conNomi: true)
