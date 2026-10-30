@@ -21,6 +21,7 @@ struct OggiView: View {
                 ScrollView {
                     Colonne(spazio: Tema.spazioSchede) {
                         if let oggi = vm.oggi {
+                            benvenuto(oggi).ingresso(0)
                             testata(oggi).ingresso(0)
                             daFare(oggi).ingresso(1)
                             novita.ingresso(1)
@@ -49,6 +50,21 @@ struct OggiView: View {
             .navigationTitle("Oggi")
             .ricercaGlobale()
             .task { await vm.carica() }
+        }
+    }
+
+    /// Lega senza rose: un benvenuto con un solo passo chiaro, che apre la configurazione guidata.
+    @ViewBuilder
+    private func benvenuto(_ oggi: Oggi) -> some View {
+        if oggi.senzaRose == true {
+            Carta("Benvenuto in Undici", simbolo: "hand.wave") {
+                Text("Per darti i consigli servono le rose della tua lega. Importale e ti guido nei passi successivi.")
+                    .font(.subheadline).foregroundStyle(.secondary)
+                Button { nav.guidaAperta = true } label: {
+                    Label("Importa le rose", systemImage: "square.and.arrow.down").frame(maxWidth: .infinity, minHeight: Tema.areaTocco)
+                }
+                .pulsanteVetro(prominente: true)
+            }
         }
     }
 
