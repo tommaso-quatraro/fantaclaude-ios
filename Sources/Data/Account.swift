@@ -281,7 +281,7 @@ final class SessioneAccount: ObservableObject {
         inCorso = true
         defer { inCorso = false }
         let corpo = CorpoRegistrazione(nomeUtente: RegoleAccount.pulisciNome(nomeUtente), password: password,
-                                       invito: invito.trimmingCharacters(in: .whitespacesAndNewlines))
+                                       invito: invito.trimmingCharacters(in: .whitespacesAndNewlines).uppercased())
         let r: RispostaAccount = try await server.posta("POST", "/api/account/registra", corpo)
         try conferma(r)
         codiceDaMostrare = r.codiceRecupero

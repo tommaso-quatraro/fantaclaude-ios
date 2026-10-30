@@ -353,8 +353,12 @@ final class SessioneAccountTests: XCTestCase {
 
     func testRegistrazioneMostraIlCodiceDiRecuperoEPoiLoNasconde() async throws {
         memoria.set(true, forKey: "account.multiutente")
-        let s = sessione(serverAccount())
-        try await s.registra(nomeUtente: "mister.rossi", password: "Tre-Quarti-Dieci", invito: " INV-123 ")
+        let server = serverAccount()
+        let s = sessione(server)
+        try await s.registra(nomeUtente: "mister.rossi", password: "Tre-Quarti-Dieci", invito: " inv-123 ")
+        let corpo = try XCTUnwrap(JSONSerialization.jsonObject(with: XCTUnwrap(server.corpiInviati(a: "/registra").first)) as? [String: Any])
+        XCTAssertEqual(corpo["invito"] as? String, "INV-123", "spazi tolti e maiuscolo, come i codici del server")
+        XCTAssertEqual(corpo["nativo"] as? Bool, true)
         XCTAssertEqual(s.codiceDaMostrare, "AAAAA-BBBBB-CCCCC")
         XCTAssertNotNil(s.utente)
         s.codiceDaMostrare = nil   // «l'ho salvato»
