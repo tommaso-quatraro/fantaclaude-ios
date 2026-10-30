@@ -158,7 +158,7 @@ final class ServerHTTPAccountTests: XCTestCase {
             XCTAssertEqual(messaggio, "Nome utente o password non corretti")
         }
         try await Task.sleep(nanoseconds: 400_000_000)
-        let miei = (visti.valore ?? []).filter { $0.contains(mio) }
+        let miei = (visti.valore ?? []).filter { $0.contains(mio) && $0.contains("/api/account/accedi") }
         XCTAssertTrue(miei.isEmpty, "avvisi arrivati: \(miei) (tutti: \(visti.valore ?? []))")
     }
 

@@ -196,7 +196,7 @@ struct ServerHTTP: ServerClient {
             if !Self.eDiAccesso(percorso) {
                 // Si dice quale token ha fallito (solo un'impronta): se nel frattempo si è fatto un nuovo accesso, un 401 in ritardo
                 // di una richiesta vecchia non deve buttare fuori la sessione nuova.
-                var info: [String: Any] = ["server": indirizzo]
+                var info: [String: Any] = ["server": indirizzo, "percorso": percorso]
                 if let token { info["impronta"] = token.hashValue }
                 DispatchQueue.main.async {
                     NotificationCenter.default.post(name: .accessoRichiesto, object: nil, userInfo: info)
