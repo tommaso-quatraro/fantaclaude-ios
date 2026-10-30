@@ -61,8 +61,10 @@ final class AccessoUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Copia"].exists)
         let conferma = app.switches.firstMatch
         XCTAssertTrue(conferma.waitForExistence(timeout: 10))
-        conferma.coordinate(withNormalizedOffset: CGVector(dx: 0.95, dy: 0.5)).tap()
-        XCTAssertTrue(continua.isEnabled)
+        conferma.tap()
+        // lo stato di SwiftUI si aggiorna un attimo dopo il tocco: si aspetta che il pulsante si accenda
+        let acceso = expectation(for: NSPredicate(format: "isEnabled == true"), evaluatedWith: continua)
+        wait(for: [acceso], timeout: 15)
         continua.tap()
         XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 30))
     }
