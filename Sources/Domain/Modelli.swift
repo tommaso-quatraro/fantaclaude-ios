@@ -288,6 +288,8 @@ struct FormazioneBreve: Decodable {
     let modulo: String?
     let punteggioAtteso: Double?
     let squadra: String?
+    let dev: Double?
+    let intervallo: IntervalloPunti?
 }
 
 struct Avviso: Decodable, Identifiable {
@@ -376,6 +378,8 @@ struct OpzioneModulo: Decodable, Identifiable {
     let dev: Double?
     let titolari: [Int]
     let panchina: [Int]
+    /// La fascia dei punti (8 volte su 10). Facoltativa (server vecchio).
+    let intervallo: IntervalloPunti?
     var id: String { modulo }
 }
 
@@ -388,6 +392,7 @@ struct LivelloRischio: Decodable, Identifiable {
     let modulo: String
     let punteggioAtteso: Double
     let moduli: [OpzioneModulo]
+    let intervallo: IntervalloPunti?
     var id: Int { rischio }
 }
 
@@ -406,6 +411,7 @@ struct Formazione: Decodable {
     let fuori: [Giocatore]?
     let senzaDati: [String]?
     let dev: Double?
+    let intervallo: IntervalloPunti?
 }
 
 struct RuoloAsta: Decodable, Identifiable {
