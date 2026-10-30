@@ -350,22 +350,6 @@ struct DestinazioneDaFare: Decodable, Equatable {
     let link: String?
 
     init(scheda: String? = nil, sezione: String? = nil, link: String? = nil) { self.scheda = scheda; self.sezione = sezione; self.link = link }
-
-    /// Dove porta: prima il collegamento `fantaclaude://`, poi la sezione scritta a parole; altrimenti da nessuna parte.
-    var destinazione: Destinazione? {
-        if let link, let url = URL(string: link), let d = Collegamenti.interpreta(url) { return d }
-        if let sezione, let s = Sezione(rawValue: sezione.lowercased()) { return .sezione(s) }
-        return nil
-    }
-}
-
-extension Oggi {
-    /// Le cose da fare in ordine di urgenza (a parità, l'ordine del server), senza voci vuote.
-    var cosePerOrdine: [DaFareVoce] {
-        (daFare ?? []).enumerated().filter { !$0.element.testo.isEmpty }
-            .sorted { ($0.element.priorita ?? 3, $0.offset) < ($1.element.priorita ?? 3, $1.offset) }
-            .map(\.element)
-    }
 }
 
 struct OpzioneModulo: Decodable, Identifiable {
