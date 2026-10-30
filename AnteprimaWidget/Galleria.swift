@@ -115,7 +115,7 @@ struct Galleria: View {
     private var voce: Voce { DatiGalleria.voce(args.string(forKey: "DATI") ?? "pieni") }
 
     var body: some View {
-        let famiglie = DatiGalleria.famiglie(widget).filter { MisureWidget.accessorio($0) == soloBlocco }
+        let famiglie = DatiGalleria.famiglie(widget).filter { MisureWidget.accessorio($0) == soloBlocco && (MisureWidget.ipad || $0 != .systemExtraLarge) }
         ZStack {
             (schema == .dark ? Color(white: 0.12) : Color(white: 0.82)).ignoresSafeArea()
             ScrollView {

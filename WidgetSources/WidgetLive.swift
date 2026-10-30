@@ -23,6 +23,8 @@ struct RigaPartitaLive: View {
     let miei: [GiocatoreWidget]
     var conEventi = 0
     var lato: CGFloat = 20
+    /// Tutto su una riga (avatar dopo la sigla) per il Cruscotto, dove lo spazio e' poco.
+    var compatto = false
     @Environment(\.widgetRenderingMode) private var modoSistema
     @Environment(\.renderForzato) private var modoForzato
     private var modo: WidgetRenderingMode { modoForzato ?? modoSistema }
@@ -44,11 +46,14 @@ struct RigaPartitaLive: View {
                     Text(p.punteggio).font(.system(.body, design: .rounded).weight(.bold)).monospacedDigit()
                         .foregroundStyle(p.inGioco ? TintaWidget.accento(modo) : .white).widgetAccentable(p.inGioco)
                     Text(ColoriSquadra.sigla(p.trasferta)).font(.footnote.weight(.semibold)).frame(width: 34, alignment: .leading)
+                    if compatto {
+                        HStack(spacing: -4) { ForEach(miei.prefix(3)) { g in AvatarMini(g: g, lato: lato) } }.padding(.leading, 4)
+                    }
                     Spacer(minLength: 4)
                     Text(p.etichetta).font(.caption.weight(p.inGioco ? .bold : .regular)).monospacedDigit()
                         .foregroundStyle(p.inGioco ? TintaWidget.accento(modo) : TintaWidget.testo2).lineLimit(1)
                 }
-                if !miei.isEmpty {
+                if !miei.isEmpty && !compatto {
                     HStack(spacing: 4) {
                         ForEach(miei.prefix(4)) { g in AvatarMini(g: g, lato: lato) }
                         Text(miei.prefix(3).map(\.cognome).joined(separator: ", ") + (miei.count > 3 ? " +\(miei.count - 3)" : ""))
@@ -90,7 +95,10 @@ struct VistaLive: View {
     /// Quelle da mostrare: se qualcuna e' in gioco quelle, altrimenti le prossime (e per ultime le finite).
     private func scelte(_ w: RiassuntoWidget, massimo: Int) -> [PartitaLive] {
         let inGioco = w.partiteInGioco
-        if !inGioco.isEmpty { return Array(inGioco.prefix(massimo)) }
+        if !inGioco.isEmpty {
+            // in grande, dopo quelle in gioco anche le prossime
+            return Array((inGioco + (famiglia == .systemLarge ? w.partiteLive.filter { !$0.inGioco && !$0.finita } : [])).prefix(massimo))
+        }
         let prossime = w.partiteLive.filter { !$0.finita }
         return Array((prossime.isEmpty ? w.partiteLive : prossime).prefix(massimo))
     }

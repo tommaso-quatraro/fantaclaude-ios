@@ -111,14 +111,14 @@ struct VistaCruscotto: View {
 
     /// Le partite in corso (con i miei titolari) o, se non ce ne sono, la prossima da giocare.
     @ViewBuilder
-    private func live(_ w: RiassuntoWidget, lato: CGFloat = 16) -> some View {
+    private func live(_ w: RiassuntoWidget, lato: CGFloat = 15) -> some View {
         let inGioco = w.partiteInGioco
         let mostra: [PartitaLive] = inGioco.isEmpty ? (w.prossimaPartita(dopo: voce.date).map { [$0] } ?? []) : Array(inGioco.prefix(2))
         if !mostra.isEmpty {
             VStack(alignment: .leading, spacing: 3) {
                 TitoloBlocco(testo: inGioco.isEmpty ? "Prossima partita" : "In corso", icona: "soccerball")
                 ForEach(mostra) { p in
-                    RigaPartitaLive(p: p, miei: inGioco.isEmpty ? [] : w.mieiTitolari(in: p), lato: lato)
+                    RigaPartitaLive(p: p, miei: inGioco.isEmpty ? [] : w.mieiTitolari(in: p), lato: lato, compatto: true)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -173,13 +173,13 @@ struct VistaCruscotto: View {
                 formazione(f)
             }
             HStack(alignment: .top, spacing: 10) {
-                CampoMini(titolari: tit, lato: 24)
+                CampoMini(titolari: tit, lato: 20)
                     .frame(width: 150)
-                dubbi(w, massimo: 3)
+                dubbi(w, massimo: 2, lato: 22)
             }
             liveOScambio(w)
             HStack(alignment: .bottom, spacing: 12) {
-                punti(w, altezza: 34)
+                punti(w, altezza: 26)
                 crediti(w)
             }
             PiedeDati(voce: voce)
