@@ -109,11 +109,17 @@ final class ProvaConnessioneTests: XCTestCase {
     func testLaProvaNonManda5IlTokenENonToccaLaSessione() async {
         let visto = Scatola<String>()
         let s = sessione { r in visto.valore = r.value(forHTTPHeaderField: "Authorization") ?? "nessuno"; return (401, Data(#"{"detail": "x"}"#.utf8)) }
-        let nessunAvviso = expectation(forNotification: .accessoRichiesto, object: nil) { n in (n.userInfo?["percorso"] as? String) == "/api/stato" }
-        nessunAvviso.isInverted = true
+        let avvisi = Scatola<Int>()
+        avvisi.valore = 0
+        let osservatore = NotificationCenter.default.addObserver(forName: .accessoRichiesto, object: nil, queue: .main) { n in
+            // Solo gli avvisi del nostro indirizzo: altri test possono lasciare 401 in coda.
+            if (n.userInfo?["server"] as? String)?.contains("prova-connessione-token") == true { avvisi.valore = (avvisi.valore ?? 0) + 1 }
+        }
+        defer { NotificationCenter.default.removeObserver(osservatore) }
         _ = await ProvaConnessione.prova("https://prova-connessione-token.invalid", sessione: s)
         XCTAssertEqual(visto.valore, "nessuno", "il token non viaggia verso un indirizzo ancora da provare")
-        await fulfillment(of: [nessunAvviso], timeout: 0.3)
+        try? await Task.sleep(nanoseconds: 300_000_000)
+        XCTAssertEqual(avvisi.valore, 0, "un 401 della prova non manda l'app alla schermata di accesso")
     }
 
     func testPulisciGliIndirizzi() {
