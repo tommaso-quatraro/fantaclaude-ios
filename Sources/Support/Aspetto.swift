@@ -11,7 +11,7 @@ enum Accento: String, CaseIterable, Identifiable {
     /// Sul fondo scuro: più chiaro.
     var scuro: UIColor {
         switch self {
-        case .verde: return Self.da(0x3ddc97)   // verde di stato di Undici (scuro)
+        case .verde: return Self.da(0x3ddc97)   // verde acceso di Undici (tema scuro, invariato)
         case .blu: return Self.da(0x5aa9ff)
         case .viola: return Self.da(0xb78bff)
         case .arancio: return Self.da(0xffab52)
@@ -23,7 +23,7 @@ enum Accento: String, CaseIterable, Identifiable {
     /// Sul fondo chiaro: più scuro, per restare leggibile.
     var chiaro: UIColor {
         switch self {
-        case .verde: return Self.da(0x0a7d4c)   // verde di stato di Undici (chiaro, contrasto 5:1 sul bianco)
+        case .verde: return Self.da(0x526600)   // oliva scuro di Undici (azioni nel tema chiaro, 6,4:1 sul bianco, 5,7:1 sul grigio dei fondi)
         case .blu: return Self.da(0x1d6fd6)
         case .viola: return Self.da(0x7a45d6)
         case .arancio: return Self.da(0xb45f04)
