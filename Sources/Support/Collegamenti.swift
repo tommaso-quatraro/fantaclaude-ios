@@ -4,12 +4,14 @@ import Foundation
 enum Destinazione: Equatable {
     case sezione(Sezione)
     case giocatore(Int)
+    /// Una pagina di Squadra o di Altro (`fantaclaude://scambi`).
+    case pagina(PaginaLega)
     /// Il foglio delle Impostazioni (`fantaclaude://impostazioni`).
     case impostazioni
 }
 
 /// Indirizzi accettati dall'app (schema `fantaclaude://`), per aprirla dal tocco su una notifica di ntfy (intestazione `Click`):
-/// `fantaclaude://oggi`, `formazione`, `mercato`, `scambi`, `lega` e `fantaclaude://giocatore/<id>`.
+/// `fantaclaude://oggi`, `formazione`, `squadra`, `altro` (e i vecchi `mercato`, `scambi`, `lega`) e `fantaclaude://giocatore/<id>`.
 enum Collegamenti {
     static let schema = "fantaclaude"
 
@@ -24,6 +26,7 @@ enum Collegamenti {
             guard let testo = url.pathComponents.dropFirst().first, let id = Int(testo), id > 0 else { return nil }
             return .giocatore(id)
         }
-        return Sezione(rawValue: host).map { .sezione($0) }
+        if host == "scambi" { return .pagina(.scambi) }   // Scambi è una pagina di Altro
+        return Sezione.da(nome: host).map { .sezione($0) }
     }
 }
