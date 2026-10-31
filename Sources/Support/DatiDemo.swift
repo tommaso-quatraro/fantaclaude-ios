@@ -459,6 +459,8 @@ private enum DatiDemo {
                 "attuali": ["voci": ["app.errore_modello": ["valore": 1.6, "aggiornato": "2026-10-28T00:38:07"]]],
             ],
         ])
+    }
+
     // MARK: - Risultati in diretta
 
     /// Alcune partite in corso, una finita e il resto da giocare: la scheda «Partite del turno» di Oggi si vede viva.
