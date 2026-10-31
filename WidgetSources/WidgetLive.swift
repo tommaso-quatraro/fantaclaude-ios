@@ -151,8 +151,8 @@ struct VistaLive: View {
     private func elenco(_ w: RiassuntoWidget, massimo: Int, eventi: Bool) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             IntestazioneWidget(titolo: titolo(w), icona: "soccerball", destra: Quando.data(w.live?.aggiornatoIl).map { "agg. \(Quando.ora($0))" })
-            ForEach(scelte(w, massimo: massimo)) { p in
-                RigaPartitaLive(p: p, miei: w.mieiTitolari(in: p), conEventi: eventi, lato: eventi > 0 ? 24 : 18)
+            ForEach(entranti(w, massimo: massimo, conEventi: eventi)) { p in
+                RigaPartitaLive(p: p, miei: w.mieiTitolari(in: p), conEventi: eventi, lato: eventi ? 24 : 18)
             }
             Spacer(minLength: 0)
             PiedeDati(voce: voce)
