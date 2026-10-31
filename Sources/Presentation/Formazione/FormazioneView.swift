@@ -18,8 +18,8 @@ struct FormazioneView: View {
         case ...(-2): return "Punta su chi gioca quasi di sicuro: meno rischio di una brutta giornata, anche se i punti attesi scendono un po'."
         case -1: return "Preferisce i titolari più sicuri, accettando di perdere qualche decimo di punto atteso."
         case 0: return "Il sistema sceglie la formazione con più punti attesi e, a parità, quella con i titolari più sicuri."
-        case 1: return "Qualche scommessa su chi, se gioca, può fare molti punti: più possibilità di una giornata eccezionale."
-        default: return "Scommette di più su chi può fare il colpo: la giornata eccezionale è più probabile, ma anche quella brutta."
+        case 1: return "Qualche puntata su chi, se gioca, può fare molti punti: più possibilità di una giornata eccezionale."
+        default: return "Punta di più su chi può fare il colpo: la giornata eccezionale è più probabile, ma anche quella brutta."
         }
     }
 
@@ -225,7 +225,7 @@ struct FormazioneView: View {
                     if let nome = f.squadra { StemmaSquadra(nome: nome, dimensione: 28, nascondiSeMancante: true) }
                     Text(v.modulo).font(.system(.title2, design: .rounded).weight(.bold))
                 }
-                Text("Giornata \(f.giornata) · " + (vm.manuale != nil ? "la tua scelta" : (v.modulo == f.modulo && vm.rischio == (f.stileConsigliato ?? 0) ? "modulo consigliato" : "modulo scelto")))
+                Text(f.etichettaGiornata + " · " + (vm.manuale != nil ? "la tua scelta" : (v.modulo == f.modulo && vm.rischio == (f.stileConsigliato ?? 0) ? "modulo consigliato" : "modulo scelto")))
                     .font(.caption).foregroundStyle(.secondary)
             }
             Spacer()

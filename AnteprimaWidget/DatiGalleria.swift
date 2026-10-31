@@ -45,7 +45,7 @@ enum DatiGalleria {
         let avvisi = titolari.filter { $0.4 < 0.9 }.map { giocatore($0).dropLast() + #", "tipo": "dubbio", "in_formazione": true}"# }.joined(separator: ",")
         let rosa = titolari.map { giocatore($0, conPartita: true) }.joined(separator: ",")
         var t = #"""
-        {"giornata": 11, "prima_partita": "\#(data(320))", "scadenza": "\#(data(320))", "ore_mancanti": 5.3, "iniziata": false, "con_probabili": true,
+        {"giornata": 11, "giornata_lega": 8, "prima_partita": "\#(data(320))", "scadenza": "\#(data(320))", "ore_mancanti": 5.3, "iniziata": false, "con_probabili": true,
          "squadra": "Undici FC", "crediti_residui": 12,
          "formazione": {"modulo": "3-4-3", "punti_attesi": 73.7, "intervallo": {"basso": 62.2, "alto": 84.6, "confidenza": 0.8, "indicativo": false}, "titolari": [\#(tit)], "panchina": [201, 202, 203, 204, 205, 206, 207]},
          "avvisi": [\#(avvisi)], "rosa": [\#(rosa)],
@@ -55,8 +55,8 @@ enum DatiGalleria {
          "dati": {"ultimo_aggiornamento": "2026-10-30T14:32:00"},
          "live": {"aggiornato_il": "\#(data(0)):04", "fonte": "espn", "in_corso": 2, "partite": [
            {"casa": "inter", "trasferta": "roma", "data": "\#(data(-63))", "stato": "secondo_tempo", "minuto": "63'", "gol_casa": 2, "gol_trasferta": 0,
-            "eventi": [{"tipo": "gol", "minuto": "10'", "squadra": "casa", "chi": "M. Thuram"}, {"tipo": "gol", "minuto": "41'", "squadra": "casa", "chi": "L. Martinez"},
-                       {"tipo": "giallo", "minuto": "55'", "squadra": "trasferta", "chi": "Cristante"}]},
+            "eventi": [{"tipo": "gol", "minuto": "10'", "squadra": "casa", "chi": "M. Thuram", "assist": "Barella"}, {"tipo": "gol", "minuto": "41'", "squadra": "casa", "chi": "L. Martinez"},
+                       {"tipo": "giallo", "minuto": "55'", "squadra": "trasferta", "chi": "Cristante"}, {"tipo": "rigore", "minuto": "58'", "squadra": "trasferta", "chi": "Dybala"}]},
            {"casa": "napoli", "trasferta": "milan", "data": "\#(data(-21))", "stato": "primo_tempo", "minuto": "21'", "gol_casa": 0, "gol_trasferta": 1,
             "eventi": [{"tipo": "gol", "minuto": "14'", "squadra": "trasferta", "chi": "R. Leao"}]},
            {"casa": "lazio", "trasferta": "juventus", "data": "\#(data(95))", "stato": "da_giocare", "minuto": null, "gol_casa": null, "gol_trasferta": null, "eventi": []}]}

@@ -96,7 +96,7 @@ struct VistaFormazione: View {
 
     private func contenutoMinimo(_ r: RiassuntoOggi) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            IntestazioneWidget(titolo: "Formazione", icona: "sportscourt", destra: "G\(r.giornata)")
+            IntestazioneWidget(titolo: "Formazione", icona: "sportscourt", destra: r.siglaGiornata)
             Spacer(minLength: 0)
             Text(r.modulo ?? "—").font(.system(.largeTitle, design: .rounded).weight(.bold))
             Text("\(Formato.punti(r.punti)) punti attesi").font(.caption).foregroundStyle(TintaWidget.testo2)
@@ -108,7 +108,7 @@ struct VistaFormazione: View {
 
     private func piccolo(_ w: RiassuntoWidget, _ f: FormazioneWidget) -> some View {
         VStack(alignment: .leading, spacing: 2) {
-            IntestazioneWidget(titolo: "Formazione", icona: "sportscourt", destra: w.giornata.map { "G\($0)" })
+            IntestazioneWidget(titolo: f.tuaScelta == true ? "La tua scelta" : "Formazione", icona: "sportscourt", destra: w.siglaGiornata)
             Spacer(minLength: 0)
             Text(f.modulo ?? "—").font(.system(.largeTitle, design: .rounded).weight(.bold)).minimumScaleFactor(0.5).lineLimit(1)
             Text(punti(f)).font(.title3.bold()).monospacedDigit()
@@ -127,7 +127,7 @@ struct VistaFormazione: View {
     private func medio(_ w: RiassuntoWidget, _ f: FormazioneWidget, _ tit: [GiocatoreWidget]) -> some View {
         HStack(alignment: .center, spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
-                IntestazioneWidget(titolo: "Formazione", icona: "sportscourt")
+                IntestazioneWidget(titolo: f.tuaScelta == true ? "La tua scelta" : "Formazione", icona: "sportscourt")
                 Spacer(minLength: 0)
                 Text(f.modulo ?? "—").font(.system(.largeTitle, design: .rounded).weight(.bold)).minimumScaleFactor(0.5).lineLimit(1)
                 Text(punti(f)).font(.title3.bold()).monospacedDigit()
@@ -149,11 +149,11 @@ struct VistaFormazione: View {
             HStack(alignment: .center) {
                 Text(f.modulo ?? "—").font(.system(.largeTitle, design: .rounded).weight(.bold)).lineLimit(1).minimumScaleFactor(0.5)
                 VStack(alignment: .leading, spacing: 0) {
-                    Text("\(punti(f)) punti attesi").font(.subheadline).monospacedDigit().foregroundStyle(TintaWidget.testo2).lineLimit(1)
+                    Text("\(punti(f)) punti attesi\(f.tuaScelta == true ? " · la tua scelta" : "")").font(.subheadline).monospacedDigit().foregroundStyle(TintaWidget.testo2).lineLimit(1)
                     if let t = f.intervallo?.testo { Text(t).font(.caption).foregroundStyle(TintaWidget.testo2).lineLimit(1) }
                 }
                 Spacer()
-                if let g = w.giornata { Text("Giornata \(g)").font(.caption).foregroundStyle(TintaWidget.testo2) }
+                if let g = w.etichettaGiornata { Text(g).lineLimit(1).minimumScaleFactor(0.7).font(.caption).foregroundStyle(TintaWidget.testo2) }
             }
             CampoMini(titolari: tit, lato: 40, conNomi: true)
             HStack {
@@ -173,7 +173,7 @@ struct VistaFormazione: View {
             VStack(spacing: 8) {
                 HStack(alignment: .firstTextBaseline) {
                     Text(f.modulo ?? "—").fontWidget(40, weight: .bold, design: .rounded).lineLimit(1).minimumScaleFactor(0.6)
-                    Text("\(punti(f)) punti attesi").font(.headline).monospacedDigit().foregroundStyle(TintaWidget.testo2)
+                    Text("\(punti(f)) punti attesi\(f.tuaScelta == true ? " · la tua scelta" : "")").font(.headline).monospacedDigit().foregroundStyle(TintaWidget.testo2)
                     if let t = f.intervallo?.testo { Text(t).font(.subheadline).foregroundStyle(TintaWidget.testo2) }
                     Spacer()
                 }
@@ -212,13 +212,13 @@ struct VistaFormazione: View {
 
     private func rettangolare(_ w: RiassuntoWidget, _ f: FormazioneWidget) -> some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text("Formazione \(f.modulo ?? "—")").font(.headline)
+            Text("\(f.tuaScelta == true ? "La tua scelta" : "Formazione") \(f.modulo ?? "—")").font(.headline)
             Text(f.intervallo?.testo.map { "\(punti(f)) attesi · \($0)" } ?? "\(punti(f)) punti attesi")
                 .font(.caption).monospacedDigit().lineLimit(1).minimumScaleFactor(0.7)
             if !w.daControllare.isEmpty {
                 Text("\(w.daControllare.count) da controllare").font(.caption2)
-            } else if let g = w.giornata {
-                Text("Giornata \(g)").font(.caption2).foregroundStyle(.secondary)
+            } else if let g = w.etichettaGiornata {
+                Text(g).lineLimit(1).minimumScaleFactor(0.7).font(.caption2).foregroundStyle(.secondary)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
