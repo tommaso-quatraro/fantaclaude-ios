@@ -290,6 +290,17 @@ struct FormazioneBreve: Decodable {
     let squadra: String?
     let dev: Double?
     let intervallo: IntervalloPunti?
+    /// true se è la formazione salvata dall'utente (non la consigliata). Letto in modo tollerante: se manca o ha un tipo strano vale «consigliata».
+    private let tuaSceltaLetta: Tollerante<Bool>?
+    var tuaScelta: Bool { tuaSceltaLetta?.valore ?? false }
+
+    private enum CodingKeys: String, CodingKey {
+        case modulo, punteggioAtteso, squadra, dev, intervallo
+        case tuaSceltaLetta = "tuaScelta"
+    }
+
+    /// Titolo della scheda in Oggi, coerente con quello che mostra.
+    var titoloScheda: String { tuaScelta ? "La tua formazione · la tua scelta" : "La formazione consigliata" }
 }
 
 struct Avviso: Decodable, Identifiable {
@@ -431,6 +442,8 @@ struct LivelloRischio: Decodable, Identifiable {
 struct Formazione: Decodable {
     let squadra: String?
     let giornata: Int
+    /// Il numero della giornata nella lega (facoltativo: server vecchio, o lega non ancora partita).
+    let giornataLega: Int?
     let modulo: String
     let punteggioAtteso: Double
     let titolari: [Giocatore]

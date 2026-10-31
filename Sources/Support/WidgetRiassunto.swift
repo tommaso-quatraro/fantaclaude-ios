@@ -64,6 +64,20 @@ struct FormazioneWidget: Codable, Equatable {
     var titolari: [GiocatoreWidget]?
     var panchina: [Int]?
     var intervallo: IntervalloWidget?
+    /// true se il server manda la formazione salvata dall'utente (non la consigliata). Facoltativo e tollerante.
+    var tuaScelta: Bool?
+
+    private enum CodingKeys: String, CodingKey { case modulo, puntiAttesi, titolari, panchina, intervallo, tuaScelta }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        modulo = try? c.decodeIfPresent(String.self, forKey: .modulo)
+        puntiAttesi = try? c.decodeIfPresent(Double.self, forKey: .puntiAttesi)
+        titolari = try? c.decodeIfPresent([GiocatoreWidget].self, forKey: .titolari)
+        panchina = try? c.decodeIfPresent([Int].self, forKey: .panchina)
+        intervallo = try? c.decodeIfPresent(IntervalloWidget.self, forKey: .intervallo)
+        tuaScelta = try? c.decodeIfPresent(Bool.self, forKey: .tuaScelta)
+    }
 }
 
 struct PuntiGiornata: Codable, Equatable, Identifiable {
@@ -134,6 +148,8 @@ struct DatiAggiornamentoWidget: Codable, Equatable {
 
 struct RiassuntoWidget: Decodable {
     var giornata: Int?
+    /// Il numero nella lega (facoltativo: server vecchio, o lega non ancora partita).
+    var giornataLega: Int?
     var primaPartita: String?
     var scadenza: String?
     var oreMancanti: Double?
@@ -161,12 +177,16 @@ struct RiassuntoWidget: Decodable {
     var live: LiveWidget? { liveLetto?.valore }
 
     enum CodingKeys: String, CodingKey {
-        case giornata, primaPartita, scadenza, oreMancanti, iniziata, conProbabili, squadra, creditiResidui, formazione, avvisi, rosa
+        case giornata, giornataLega, primaPartita, scadenza, oreMancanti, iniziata, conProbabili, squadra, creditiResidui, formazione, avvisi, rosa
         case squalificati, diffidati, rigoristi, diario, osservati, dati, mancano
         case scambioLetto = "scambio"
         case svincolatoLetto = "svincolato"
         case liveLetto = "live"
     }
+
+    /// «Giornata 7 di lega (Serie A 10)», «Giornata 10» o nil se la giornata non si conosce.
+    var etichettaGiornata: String? { giornata.map { TempiLega.etichetta(serieA: $0, lega: giornataLega) } }
+    var siglaGiornata: String? { giornata.map { TempiLega.sigla(serieA: $0, lega: giornataLega) } }
 
     /// Quando comincia la giornata (la scadenza della formazione).
     var inizio: Date? { Quando.data(scadenza) }
@@ -187,7 +207,8 @@ struct RiassuntoWidget: Decodable {
         let dubbi = daControllare
         return RiassuntoOggi(giornata: giornata, inizio: inizio, modulo: formazione?.modulo, punti: formazione?.puntiAttesi,
                              daControllare: dubbi.count, probabili: conProbabili, scaricatoIl: scaricatoIl,
-                             dubbi: dubbi.prefix(6).map { DubbioRiassunto(id: $0.id, nome: $0.nome, ruolo: $0.ruolo, tipo: $0.tipo, pVoto: $0.pVoto) })
+                             dubbi: dubbi.prefix(6).map { DubbioRiassunto(id: $0.id, nome: $0.nome, ruolo: $0.ruolo, tipo: $0.tipo, pVoto: $0.pVoto) },
+                             giornataLega: giornataLega)
     }
 
     static func leggi(_ dati: Data) -> RiassuntoWidget? {
@@ -361,6 +382,24 @@ struct EventoLive: Decodable, Equatable {
     var minuto: String?
     var squadra: String?
     var chi: String?
+    /// Chi ha fatto l'assist (solo per i gol, se il server lo sa).
+    var assist: String?
+
+    enum CodingKeys: String, CodingKey { case tipo, minuto, squadra, chi, assist }
+
+    init(tipo: String? = nil, minuto: String? = nil, squadra: String? = nil, chi: String? = nil, assist: String? = nil) {
+        self.tipo = tipo; self.minuto = minuto; self.squadra = squadra; self.chi = chi; self.assist = assist
+    }
+
+    /// Tollerante: un campo del tipo sbagliato (per esempio l'assist come oggetto) non rovina l'evento né la partita.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        tipo = try? c.decodeIfPresent(String.self, forKey: .tipo)
+        minuto = (try? c.decodeIfPresent(String.self, forKey: .minuto)) ?? (try? c.decodeIfPresent(Int.self, forKey: .minuto)).map { "\($0)'" }
+        squadra = try? c.decodeIfPresent(String.self, forKey: .squadra)
+        chi = try? c.decodeIfPresent(String.self, forKey: .chi)
+        assist = try? c.decodeIfPresent(String.self, forKey: .assist)
+    }
 }
 
 struct PartitaLive: Decodable, Equatable, Identifiable {

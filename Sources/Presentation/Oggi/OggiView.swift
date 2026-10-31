@@ -16,6 +16,7 @@ struct OggiView: View {
     @ScaledMetric(relativeTo: .largeTitle) private var corpoGrande: CGFloat = 46
     @ScaledMetric(relativeTo: .body) private var latoIcona: CGFloat = 24
     @State private var novitaAnimata = false
+    @Environment(\.accessibilityReduceMotion) private var ridotto
     @State private var tutteLeCose = false
     @Environment(\.scenePhase) private var fase
 
@@ -150,7 +151,7 @@ struct OggiView: View {
                         Text("alla scadenza della formazione, \(Quando.leggibile(oggi.chiusura))").font(.subheadline).foregroundStyle(.white.opacity(0.8))
                     } else {
                         Label("In corso", systemImage: "dot.radiowaves.left.and.right")
-                            .symbolEffect(.variableColor.iterative, options: .repeating)
+                            .symbolEffect(.variableColor.iterative, options: .repeating, isActive: !ridotto)
                             .font(.system(size: corpoGrande * 0.87, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
                         Text("formazione chiusa \(Quando.leggibile(oggi.chiusura))").font(.subheadline).foregroundStyle(.white.opacity(0.8))
@@ -174,7 +175,7 @@ struct OggiView: View {
                 HStack(spacing: 10) {
                     Image(systemName: "sparkles")
                         .symbolRenderingMode(.hierarchical)
-                        .symbolEffect(.bounce, value: novitaAnimata)
+                        .symbolEffect(.bounce, value: ridotto ? false : novitaAnimata)
                         .accessibilityHidden(true)
                     Text("Novità nell'app (versione \(versione)): tocca per vedere")
                         .font(.subheadline.weight(.semibold))
@@ -198,7 +199,7 @@ struct OggiView: View {
     // MARK: formazione e avvisi
 
     private func formazione(_ oggi: Oggi) -> some View {
-        Carta("La tua formazione", simbolo: "sportscourt") {
+        Carta(oggi.formazione?.titoloScheda ?? "La formazione consigliata", simbolo: "sportscourt") {
             if let f = oggi.formazione, f.disponibile {
                 HStack(alignment: .firstTextBaseline) {
                     Text(f.modulo ?? "—").font(.system(.largeTitle, design: .rounded).weight(.bold))
@@ -212,6 +213,7 @@ struct OggiView: View {
                     }
                 }
                 .accessibilityElement(children: .combine)
+                .accessibilityLabel("\(f.tuaScelta ? "La tua scelta" : "Consigliata"): modulo \(f.modulo ?? "non disponibile"), \(Formato.punti(f.punteggioAtteso)) punti attesi")
                 Button { vaiASezione(.formazione) } label: { Label("Apri la formazione", systemImage: "sportscourt").frame(maxWidth: .infinity, minHeight: Tema.areaTocco) }
                     .pulsanteVetro(prominente: true)
                 if let p = oggi.probabili?.valore {
