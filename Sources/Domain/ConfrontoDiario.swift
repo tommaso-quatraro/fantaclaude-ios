@@ -52,13 +52,13 @@ struct ConfrontoDiario: Equatable {
 
         let tue = v.schierata?.titolari ?? []
         let chiaviCons = Set(base.compactMap(Self.chiave)), chiaviTue = Set(tue.compactMap(Self.chiave))
-        func righe(_ l: [TitolareDiario], contro altre: Set<String>) -> [Riga] {
+        func righe(_ l: [TitolareDiario], contro altre: Set<String>?) -> [Riga] {
             let ordinate = l.enumerated().sorted { a, b in
                 let ra = Self.ordineRuolo(a.element.ruolo), rb = Self.ordineRuolo(b.element.ruolo)
                 return ra == rb ? a.offset < b.offset : ra < rb
             }
             return ordinate.map { i, t in
-                Riga(id: i, ruolo: t.ruolo ?? "", nome: t.nome ?? "–", diverso: Self.chiave(t).map { !altre.contains($0) } ?? false)
+                Riga(id: i, ruolo: t.ruolo ?? "", nome: t.nome ?? "–", diverso: Self.chiave(t).map { k in altre.map { !$0.contains(k) } ?? false } ?? false)
             }
         }
         if v.schierata != nil, !tue.isEmpty {
@@ -76,7 +76,7 @@ struct ConfrontoDiario: Equatable {
                 fraseCambi = "Hai cambiato \(cambiati): \(Self.elenco(dentro)) al posto di \(Self.elenco(fuori))."
             }
         } else {
-            consigliata = righe(base, contro: [])
+            consigliata = righe(base, contro: nil)
             schierata = nil
             titoloSchierata = nil
             fraseCambi = nil
