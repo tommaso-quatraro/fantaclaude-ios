@@ -65,8 +65,8 @@ enum DatiGalleria {
             t += #", "diario": [], "mancano": ["scambio", "svincolato"]}"#
         } else {
             t += #"""
-            , "diario": [{"giornata": 10, "attesi": 66.0, "fatti": 63.5}, {"giornata": 9, "attesi": 67.0, "fatti": 71.0},
-                        {"giornata": 8, "attesi": 69.0, "fatti": 69.5}, {"giornata": 7, "attesi": 70.0, "fatti": 64.5}, {"giornata": 6, "attesi": 68.5, "fatti": 71.0}],
+            , "diario": [{"giornata": 10, "attesi": 66.0, "fatti": 63.5, "intervallo": {"basso": 55.0, "alto": 77.0, "confidenza": 0.8}}, {"giornata": 9, "attesi": 67.0, "fatti": 71.0, "intervallo": {"basso": 56.0, "alto": 78.0, "confidenza": 0.8}},
+                        {"giornata": 8, "attesi": 69.0, "fatti": 69.5, "intervallo": {"basso": 58.0, "alto": 80.0, "confidenza": 0.8}}, {"giornata": 7, "attesi": 70.0, "fatti": 64.5, "intervallo": {"basso": 66.0, "alto": 80.0, "confidenza": 0.8}}, {"giornata": 6, "attesi": 68.5, "fatti": 71.0, "intervallo": {"basso": 58.0, "alto": 70.0, "confidenza": 0.8}}],
               "scambio": {"mia": "Undici FC", "altra": "Real Madrink",
                           "do": [{"id": 112, "nome": "Nicolo Zaniolo", "ruolo": "C"}, {"id": 113, "nome": "Marco Carnesecchi", "ruolo": "P"}],
                           "ricevo": [{"id": 114, "nome": "Mattia Zaccagni", "ruolo": "A"}], "guadagno_mio": 3.4, "guadagno_loro": 1.1, "valido": true},
